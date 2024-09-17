@@ -5,6 +5,9 @@
 
 import sys
 import os
+import json
+
+from utilities.utilities import getConfig
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../"))
@@ -29,18 +32,42 @@ except Exception as e:
 
 
 def main():
-    log = lc.getLogger()
+    module_dir = os.path.dirname(os.path.abspath(__file__))
+    log = lc.getLogger(module_dir + "/bot.log")
     Modules = modules.Module(log)
     module_name = Modules.get_ModuleName()
     log.info(f"{lc.g}🔧 {module_name} module is running ...{lc.rs}")
-    bot_globals = {"module_name": module_name, "mcf_dir": MasterCryptoFarmBot_Dir}
+
+    bot_globals = {
+        "module_name": module_name,
+        "mcf_dir": MasterCryptoFarmBot_Dir,
+        "module_dir": module_dir,
+    }
 
     db = Database(MasterCryptoFarmBot_Dir + "/database.db", log)
     is_module_disabled = Modules.is_module_disabled(db, module_name)
     db.Close()
     if is_module_disabled:
         log.info(f"{lc.y}🚫 {module_name} module is disabled!{lc.rs}")
-        return
+        exit(0)
+
+    log.info(f"{lc.g}👤 Checking for Telegram accounts ...{lc.rs}")
+
+    if not os.path.exists(MasterCryptoFarmBot_Dir + "/telegram_accounts/accounts.json"):
+        log.error(f"{lc.r}└─ 🔴 Please add your telegram accounts first!{lc.rs}")
+        exit(1)
+
+    with open(MasterCryptoFarmBot_Dir + "/telegram_accounts/accounts.json", "r") as f:
+        Accounts = json.load(f)
+
+    if not Accounts or len(Accounts) == 0:
+        log.error(f"{lc.r}└─ 🔴 Please add your telegram accounts first!{lc.rs}")
+        exit(1)
+
+    log.info(
+        f"{lc.g}└─ 👤 {lc.rs + lc.c + "[" + str(len(Accounts)) + "]" + lc.rs + lc.g } Telegram account(s) found!{lc.rs}"
+    )
+
 
 
 if __name__ == "__main__":
