@@ -15,6 +15,7 @@ MasterCryptoFarmBot_Dir = os.path.dirname(
 sys.path.append(MasterCryptoFarmBot_Dir)
 from pyrogram import Client
 from pyrogram.raw.types import InputBotAppShortName
+from pyrogram.raw import functions
 from pyrogram.raw.functions.messages import RequestWebView, RequestAppWebView
 from urllib.parse import unquote
 import utilities.utilities as ut
@@ -78,8 +79,30 @@ class tgAccount:
 
             await self.accountSetup()
 
-            peer = await tgClient.resolve_peer("myuseragent_bot")
             referral = ut.getConfig("referral_token", "masterking32")
+            BotID = "myuseragent_bot"
+
+            bot_started = False
+            try:
+                async for message in self.tgClient.get_chat_history(BotID):
+                    if "/start" in message.text:
+                        bot_started = True
+                        break
+            except Exception as e:
+                pass
+
+            if not bot_started:
+                peer = await self.tgClient.resolve_peer(BotID)
+                await self.tgClient.invoke(
+                    functions.messages.StartBot(
+                        bot=peer,
+                        peer=peer,
+                        random_id=random.randint(100000, 999999),
+                        start_param=referral,
+                    )
+                )
+
+            peer = await tgClient.resolve_peer(BotID)
             # bot_app = InputBotAppShortName(bot_id=peer, short_name="app")
             web_view = await tgClient.invoke(
                 # RequestAppWebView(
