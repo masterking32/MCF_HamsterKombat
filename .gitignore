@@ -2,3 +2,4 @@ __pycache__
 .vscode
 bot_settings.json
 *.log
+*.txt
