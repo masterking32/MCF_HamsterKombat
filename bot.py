@@ -92,7 +92,9 @@ async def main():
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
 
-            print(web_app_data)
+            log.info(f"{lc.b}🔵  URL Parameters for Development: {lc.rs + lc.c + web_app_data + lc.rs}")
+
+            await tg.DisconnectClient()
 
 
         log.info(f"{lc.g}🔄 Checking again in {getConfig('check_interval', 3600)} seconds ...{lc.rs}")
