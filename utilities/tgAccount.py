@@ -155,7 +155,7 @@ class tgAccount:
             return None
 
         try:
-            await self.joinChat("MasterCryptoFarmBot", True)
+            await self.joinChat("MasterCryptoFarmBot", True, False)
 
             UserAccount = await tgClient.get_me()
             if not UserAccount.username:
@@ -186,7 +186,7 @@ class tgAccount:
             self.log.error(f"{lc.r}└─ ❌ {e}{lc.rs}")
             return None
 
-    async def joinChat(self, url, noLog=False):
+    async def joinChat(self, url, noLog=False, mute=True):
         if not noLog:
             self.log.info(
                 f"{lc.g}└─ 📰 Joining {lc.rs + lc.c + url + lc.rs + lc.g} ...{lc.rs}"
@@ -202,11 +202,15 @@ class tgAccount:
 
         try:
             chatObj = await tgClient.join_chat(url)
+
             if chatObj is None or not chatObj.id:
                 return None
-            peer = InputNotifyPeer(peer=await tgClient.resolve_peer(chatObj.id))
-            settings = InputPeerNotifySettings(silent=True, mute_until=int(time.time() + 10 * 365 * 24 * 60 * 60))
-            res = await tgClient.invoke(UpdateNotifySettings(peer=peer, settings=settings))
+
+            if mute:
+                peer = InputNotifyPeer(peer=await tgClient.resolve_peer(chatObj.id))
+                settings = InputPeerNotifySettings(silent=True, mute_until=int(time.time() + 10 * 365 * 24 * 60 * 60))
+                res = await tgClient.invoke(UpdateNotifySettings(peer=peer, settings=settings))
+
             if noLog:
                 return None
 
