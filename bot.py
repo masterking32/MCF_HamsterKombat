@@ -83,8 +83,8 @@ async def main():
             if "disabled" in account and account["disabled"]:
                 log.info(f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}")
                 continue
-
-            tg = tgAccount(bot_globals, log, account['session_name'])
+            
+            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'])
             web_app_data = await tg.run()
             if web_app_data is None:
                 log.error(f"{lc.r}└─ ❌ Account {account['session_name']} failed to load!{lc.rs}")

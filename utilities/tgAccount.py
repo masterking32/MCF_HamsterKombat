@@ -14,24 +14,30 @@ MasterCryptoFarmBot_Dir = os.path.dirname(
 )
 sys.path.append(MasterCryptoFarmBot_Dir)
 from pyrogram import Client
-from pyrogram.raw.types import InputBotAppShortName
+from pyrogram.raw.types import InputBotAppShortName, InputNotifyPeer, InputPeerNotifySettings
 from pyrogram.raw import functions
 from pyrogram.raw.functions.messages import RequestWebView, RequestAppWebView
+from pyrogram.raw.functions.account import UpdateNotifySettings
 from urllib.parse import unquote
+from utils.utils import testProxy, parseProxy
 import utilities.utilities as ut
 import utils.logColors as lc
-
-
+    
 class tgAccount:
-    def __init__(self, bot_globals, log, accountName):
+    def __init__(self, bot_globals, log, accountName, proxy):
         self.bot_globals = bot_globals
         self.log = log
         self.accountName = accountName
         self.tgClient = None
+        self.proxy = proxy
 
     async def Connect(self):
         if self.tgClient is not None and self.tgClient.is_connected:
             return self.tgClient
+
+        if self.proxy and not testProxy(self.proxy):
+            self.log.error(f"{lc.r}└─ ❌ Proxy {self.proxy} is not working!{lc.rs}")
+            return None
 
         self.tgClient = Client(
             name=self.accountName,
@@ -39,12 +45,14 @@ class tgAccount:
             api_hash=self.bot_globals["telegram_api_hash"],
             workdir=self.bot_globals["mcf_dir"] + "/telegram_accounts",
             plugins=dict(root="bot/plugins"),
+            proxy=parseProxy(self.proxy) if self.proxy else None
         )
 
         self.log.info(f"{lc.g}└─ 🌍 Connecting {self.accountName} session ...{lc.rs}")
         try:
             isConnected = await self.tgClient.connect()
             if isConnected:
+                self.log.info(f"{lc.g}└─ 🌍 Session {self.accountName} connected successfully!{lc.rs}")
                 return self.tgClient
             else:
                 return None
@@ -76,7 +84,6 @@ class tgAccount:
                 self.log.info(
                     f"{lc.g}└─ 🔑 {self.accountName} session is loaded successfully!{lc.rs}"
                 )
-
             await self.accountSetup()
 
             referral = ut.getConfig("referral_token", "masterking32")
@@ -84,10 +91,9 @@ class tgAccount:
 
             bot_started = False
             try:
-                async for message in self.tgClient.get_chat_history(BotID):
-                    if "/start" in message.text:
-                        bot_started = True
-                        break
+                chatHistory = await self.tgClient.get_chat_history_count(BotID)
+                if chatHistory > 0:
+                    bot_started = True
             except Exception as e:
                 pass
 
@@ -149,6 +155,8 @@ class tgAccount:
             return None
 
         try:
+            await self.joinChat("MasterCryptoFarmBot", True)
+
             UserAccount = await tgClient.get_me()
             if not UserAccount.username:
                 self.log.info(
@@ -166,7 +174,7 @@ class tgAccount:
                     setUsername = await tgClient.set_username(RandomUsername)
                     maxTries -= 1
                     await time.sleep(5)
-            await self.joinChat("MasterCryptoFarmBot", True)
+            
             self.log.info(
                 f"{lc.g}└─ ✅ Account {self.accountName} session is setup successfully!{lc.rs}"
             )
@@ -193,8 +201,12 @@ class tgAccount:
             return None
 
         try:
-            await tgClient.join_chat(url)
-
+            chatObj = await tgClient.join_chat(url)
+            if chatObj is None or not chatObj.id:
+                return None
+            peer = InputNotifyPeer(peer=await tgClient.resolve_peer(chatObj.id))
+            settings = InputPeerNotifySettings(silent=True, mute_until=int(time.time() + 10 * 365 * 24 * 60 * 60))
+            res = await tgClient.invoke(UpdateNotifySettings(peer=peer, settings=settings))
             if noLog:
                 return None
 
@@ -211,6 +223,39 @@ class tgAccount:
             )
             self.log.error(f"{lc.r}❌ {e}{lc.rs}")
             return False
+    
+    async def setName(self, firstName, lastName=None):
+        tgClient = await self.Connect()
+        if tgClient is None:
+            self.log.error(
+                f"{lc.r}└─ ❌ Account {self.accountName} session is not connected!{lc.rs}"
+            )
+            return None
+        tgMe = await tgClient.get_me()
+        firstName = tgMe.first_name if not firstName else firstName
+        lastName = tgMe.last_name if not lastName else lastName
+        try:
+            await tgClient.update_profile(first_name=firstName, last_name=lastName)
+            self.log.info(
+                f"{lc.g}└─ ✅ Account {self.accountName} session name is set successfully!{lc.rs}"
+            )
+            return True
+        except Exception as e:
+            self.log.error(
+                f"{lc.r}└─ ❌ Failed to set session {self.accountName} name!{lc.rs}"
+            )
+            self.log.error(f"{lc.r}❌ {e}{lc.rs}")
+            return False
+    
+    async def getMe(self):
+        tgClient = await self.Connect()
+        if tgClient is None:
+            self.log.error(
+                f"{lc.r}└─ ❌ Account {self.accountName} session is not connected!{lc.rs}"
+            )
+            return None
+        tgMe = await tgClient.get_me()
+        return tgMe
 
     async def DisconnectClient(self):
         if self.tgClient is not None and self.tgClient.is_connected:
