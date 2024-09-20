@@ -127,6 +127,10 @@ async def main():
             account_name = account["session_name"] if "session_name" in account else account["phone_number"]
             web_app_data = account["web_app_data"] if "web_app_data" in account else None
             user_agent = account["user_agent"] if "user_agent" in account else None
+            if "disabled" in account and account["disabled"]:
+                log.info(f"{lc.y}❌ Account {account_name} is disabled!{lc.rs}")
+                continue
+
             FB = FarmBot(log, bot_globals, account_name, web_app_data, proxy, user_agent, None)
             await FB.run()
 
