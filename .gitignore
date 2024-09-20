@@ -3,3 +3,4 @@ __pycache__
 bot_settings.json
 *.log
 *.txt
+accounts.json

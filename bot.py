@@ -9,6 +9,7 @@ import json
 import asyncio
 
 from utilities.utilities import getConfig
+from FarmBot.FarmBot import FarmBot
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../"))
@@ -33,6 +34,9 @@ except Exception as e:
     )
     exit(1)
 
+async def CheckCD(log):
+    log.info(f"{lc.y}🔄 Checking again in {getConfig('check_interval', 3600)} seconds ...{lc.rs}")
+    await asyncio.sleep(getConfig("check_interval", 3600))
 
 async def main():
     module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -90,6 +94,8 @@ async def main():
                 log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
                 continue
 
+            # Your checks here before getting the webview data, if needed
+
             web_app_data = await tg.getWebViewData()
             if not web_app_data:
                 log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
@@ -97,14 +103,33 @@ async def main():
                 continue
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
-
-            log.info(f"{lc.b}🔵  URL Parameters for Development: {lc.rs + lc.c + web_app_data + lc.rs}")
+            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['proxy'], tg)
+            await FB.run()
 
             await tg.DisconnectClient()
 
+        if not os.path.exists("accounts.json"):
+            await CheckCD(log)
+            continue
 
-        log.info(f"{lc.g}🔄 Checking again in {getConfig('check_interval', 3600)} seconds ...{lc.rs}")
-        await asyncio.sleep(getConfig("check_interval", 3600))
+        log.info(f"{lc.g}👤 Checking for accounts without PyroGram ...")
+        JSON_Accounts = None
+        with open("accounts.json", "r") as f:
+            JSON_Accounts = json.load(f)
+
+        if not JSON_Accounts or len(JSON_Accounts) == 0:
+            log.info(f"{lc.y}└─ 🔄 No accounts found!{lc.rs}")
+            await CheckCD(log)
+            continue
+
+        for account in JSON_Accounts:
+            proxy = None if "proxy" not in account else account["proxy"]
+            account_name = account["session_name"] if "session_name" in account else account["phone_number"]
+            web_app_data = account["web_app_data"] if "web_app_data" in account else None
+            FB = FarmBot(log, bot_globals, account_name, web_app_data, proxy, False)
+            await FB.run()
+
+        await CheckCD(log)
 
 
 
