@@ -103,7 +103,7 @@ async def main():
                 continue
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
-            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['proxy'], tg)
+            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['user_agent'], account['proxy'], tg)
             await FB.run()
 
             await tg.DisconnectClient()
@@ -126,7 +126,8 @@ async def main():
             proxy = None if "proxy" not in account else account["proxy"]
             account_name = account["session_name"] if "session_name" in account else account["phone_number"]
             web_app_data = account["web_app_data"] if "web_app_data" in account else None
-            FB = FarmBot(log, bot_globals, account_name, web_app_data, proxy, False)
+            user_agent = account["user_agent"] if "user_agent" in account else None
+            FB = FarmBot(log, bot_globals, account_name, web_app_data, proxy, user_agent, None)
             await FB.run()
 
         await CheckCD(log)

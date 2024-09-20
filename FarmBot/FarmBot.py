@@ -16,7 +16,14 @@ import utils.logColors as lc
 
 class FarmBot:
     def __init__(
-        self, log, bot_globals, account_name, web_app_url, proxy=None, tg=None
+        self,
+        log,
+        bot_globals,
+        account_name,
+        web_app_url,
+        proxy=None,
+        user_agent=None,
+        tg=None,
     ):
         self.log = log
         self.bot_globals = bot_globals
@@ -24,6 +31,7 @@ class FarmBot:
         self.web_app_url = web_app_url
         self.proxy = proxy
         self.tg = tg
+        self.user_agent = user_agent
 
     async def run(self):
         self.log.info(
