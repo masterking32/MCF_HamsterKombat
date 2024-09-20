@@ -9,7 +9,6 @@ import json
 import asyncio
 
 from utilities.utilities import getConfig
-from utilities.tgAccount import tgAccount
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../"))
@@ -21,6 +20,7 @@ try:
     import utils.logColors as lc
     from utils.database import Database
     import utils.modules as modules
+    from utils.tgAccount import tgAccount
     import config as cfg
 except Exception as e:
     print(f"\033[31mThis module is designed for MasterCryptoFarmBot.\033[0m")
@@ -83,11 +83,17 @@ async def main():
             if "disabled" in account and account["disabled"]:
                 log.info(f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}")
                 continue
-            
-            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'])
-            web_app_data = await tg.run()
-            if web_app_data is None:
-                log.error(f"{lc.r}└─ ❌ Account {account['session_name']} failed to load!{lc.rs}")
+
+            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'], "myuseragent_bot", "ref_masterking32")
+            tgRunStatus = await tg.run()
+            if not tgRunStatus:
+                log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
+                continue
+
+            web_app_data = await tg.getWebViewData()
+            if not web_app_data:
+                log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
+                await tg.DisconnectClient()
                 continue
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
