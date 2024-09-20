@@ -8,7 +8,7 @@ import os
 import json
 import asyncio
 
-from utilities.utilities import getConfig
+import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
@@ -19,7 +19,6 @@ sys.path.append(MasterCryptoFarmBot_Dir)
 
 try:
     import utils.logColors as lc
-    from utils.database import Database
     import utils.modules as modules
     from utils.tgAccount import tgAccount
     import config as cfg
@@ -35,8 +34,8 @@ except Exception as e:
     exit(1)
 
 async def CheckCD(log):
-    log.info(f"{lc.y}🔄 Checking again in {getConfig('check_interval', 3600)} seconds ...{lc.rs}")
-    await asyncio.sleep(getConfig("check_interval", 3600))
+    log.info(f"{lc.y}🔄 Checking again in {utilities.getConfig('check_interval', 3600)} seconds ...{lc.rs}")
+    await asyncio.sleep(utilities.getConfig("check_interval", 3600))
 
 async def main():
     module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -51,10 +50,7 @@ async def main():
         "module_dir": module_dir,
     }
 
-    db = Database(MasterCryptoFarmBot_Dir + "/database.db", log)
-    is_module_disabled = Modules.is_module_disabled(db, module_name)
-    db.Close()
-    if is_module_disabled:
+    if utilities.IsModuleDisabled(bot_globals, log):
         log.info(f"{lc.y}🚫 {module_name} module is disabled!{lc.rs}")
         exit(0)
 
@@ -83,6 +79,10 @@ async def main():
     bot_globals["telegram_api_hash"] = cfg.config["telegram_api"]["api_hash"]
 
     while True:
+        if utilities.IsModuleDisabled(bot_globals, log):
+            log.info(f"{lc.y}🚫 {module_name} module is disabled!{lc.rs}")
+            utilities.KillProcess()
+
         for account in Accounts:
             if "disabled" in account and account["disabled"]:
                 log.info(f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}")

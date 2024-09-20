@@ -5,6 +5,8 @@
 import sys
 import os
 
+import utilities.utilities as utilities
+
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
 )
@@ -34,6 +36,12 @@ class FarmBot:
         self.user_agent = user_agent
 
     async def run(self):
+        if utilities.IsModuleDisabled(self.bot_globals, self.log):
+            self.log.info(
+                f"{lc.y}🚫 {self.bot_globals['module_name']} module is disabled!{lc.rs}"
+            )
+            utilities.KillProcess()
+
         self.log.info(
             f"{lc.g}🤖 Farming is starting for account {lc.rs + lc.c + self.account_name + lc.rs + lc.g}...{lc.rs}"
         )
