@@ -84,7 +84,7 @@ async def main():
                 log.info(f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}")
                 continue
 
-            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'], "myuseragent_bot", "ref_masterking32")
+            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'], "myuseragent_bot", "ref_masterking32", None, "https://api.masterking32.com/telegram_useragent.php")
             tgRunStatus = await tg.run()
             if not tgRunStatus:
                 log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
