@@ -5,7 +5,8 @@
     "type": "text",
     "placeholder": "Text Placeholder",
     "default_value": "Default Text",
-    "description": "This is an example text field"
+    "description": "This is an example text field",
+    "required": false
   },
   {
     "key": "key_number",
@@ -25,6 +26,15 @@
     "description": "This is an example checkbox field"
   },
   {
+    "key": "key_range1",
+    "name": "Example Range",
+    "type": "range",
+    "default_value": 50,
+    "description": "This is an example range field",
+    "min": 50,
+    "max": 100
+  },
+  {
     "key": "key_select1",
     "name": "Example Select",
     "type": "select",
@@ -38,6 +48,32 @@
         "name": "Option 2"
       }
     ],
-    "description": "This is an example select field"
+    "description": "This is an example select field",
+    "multi_select": false
+  },
+  {
+    "key": "key_select2",
+    "name": "Example Multi-Select",
+    "type": "select",
+    "options": [
+      {
+        "value": "option1",
+        "name": "Option 1"
+      },
+      {
+        "value": "option2",
+        "name": "Option 2"
+      },
+      {
+        "value": "option3",
+        "name": "Option 3"
+      },
+      {
+        "value": "option4",
+        "name": "Option 4"
+      }
+    ],
+    "description": "This is an example select field",
+    "multi_select": true
   }
 ]
