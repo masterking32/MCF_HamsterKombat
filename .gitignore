@@ -4,3 +4,4 @@ bot_settings.json
 *.log
 *.txt
 accounts.json
+tokens.json

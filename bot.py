@@ -103,7 +103,7 @@ async def main():
                 continue
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
-            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['user_agent'], account['proxy'], tg)
+            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['proxy'], account['user_agent'], tg)
             await FB.run()
 
             await tg.DisconnectClient()
