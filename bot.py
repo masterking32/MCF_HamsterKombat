@@ -112,7 +112,7 @@ async def main():
             await CheckCD(log)
             continue
 
-        log.info(f"{lc.g}👤 Checking for accounts without PyroGram ...")
+        log.info(f"{lc.g}👤 Checking for accounts without PyroGram ...{lc.rs}")
         JSON_Accounts = None
         with open("accounts.json", "r") as f:
             JSON_Accounts = json.load(f)
