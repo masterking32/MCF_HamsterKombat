@@ -33,9 +33,13 @@ except Exception as e:
     )
     exit(1)
 
+
 async def CheckCD(log):
-    log.info(f"{lc.y}🔄 Checking again in {utilities.getConfig('check_interval', 3600)} seconds ...{lc.rs}")
+    log.info(
+        f"{lc.y}🔄 Checking again in {utilities.getConfig('check_interval', 3600)} seconds ...{lc.rs}"
+    )
     await asyncio.sleep(utilities.getConfig("check_interval", 3600))
+
 
 async def main():
     module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -68,11 +72,16 @@ async def main():
         exit(1)
 
     log.info(
-        f"{lc.g}└─ 👤 {lc.rs + lc.c + "[" + str(len(Accounts)) + "]" + lc.rs + lc.g } Telegram account(s) found!{lc.rs}"
+        f"{lc.g}└─ 👤 {lc.rs + lc.c + '[' + str(len(Accounts)) + ']' + lc.rs + lc.g } Telegram account(s) found!{lc.rs}"
     )
 
-    if cfg.config["telegram_api"]["api_id"] == 1234 or cfg.config["telegram_api"]["api_hash"] == "":
-        log.error(f"{lc.r}🔴 Please add your Telegram API ID and API Hash to the config.py file!{lc.rs}")
+    if (
+        cfg.config["telegram_api"]["api_id"] == 1234
+        or cfg.config["telegram_api"]["api_hash"] == ""
+    ):
+        log.error(
+            f"{lc.r}🔴 Please add your Telegram API ID and API Hash to the config.py file!{lc.rs}"
+        )
         exit(1)
 
     bot_globals["telegram_api_id"] = cfg.config["telegram_api"]["api_id"]
@@ -85,25 +94,48 @@ async def main():
 
         for account in Accounts:
             if "disabled" in account and account["disabled"]:
-                log.info(f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}")
+                log.info(
+                    f"{lc.y}❌ Account {account['session_name']} is disabled!{lc.rs}"
+                )
                 continue
 
-            tg = tgAccount(bot_globals, log, account['session_name'], account['proxy'], "myuseragent_bot", "ref_masterking32", None, "https://api.masterking32.com/telegram_useragent.php")
+            tg = tgAccount(
+                bot_globals,
+                log,
+                account["session_name"],
+                account["proxy"],
+                "myuseragent_bot",
+                "ref_masterking32",
+                None,
+                "https://api.masterking32.com/telegram_useragent.php",
+            )
             tgRunStatus = await tg.run()
             if not tgRunStatus:
-                log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
+                log.error(
+                    f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}"
+                )
                 continue
 
             # Your checks here before getting the webview data, if needed
 
             web_app_data = await tg.getWebViewData()
             if not web_app_data:
-                log.error(f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}")
+                log.error(
+                    f"{lc.r}❌ Account {account['session_name']} is not ready!{lc.rs}"
+                )
                 await tg.DisconnectClient()
                 continue
 
             log.info(f"{lc.g}└─ ✅ Account {account['session_name']} is ready!{lc.rs}")
-            FB = FarmBot(log, bot_globals, account['session_name'], web_app_data, account['proxy'], account['user_agent'], tg)
+            FB = FarmBot(
+                log,
+                bot_globals,
+                account["session_name"],
+                web_app_data,
+                account["proxy"],
+                account["user_agent"],
+                tg,
+            )
             await FB.run()
 
             await tg.DisconnectClient()
@@ -124,18 +156,25 @@ async def main():
 
         for account in JSON_Accounts:
             proxy = None if "proxy" not in account else account["proxy"]
-            account_name = account["session_name"] if "session_name" in account else account["phone_number"]
-            web_app_data = account["web_app_data"] if "web_app_data" in account else None
+            account_name = (
+                account["session_name"]
+                if "session_name" in account
+                else account["phone_number"]
+            )
+            web_app_data = (
+                account["web_app_data"] if "web_app_data" in account else None
+            )
             user_agent = account["user_agent"] if "user_agent" in account else None
             if "disabled" in account and account["disabled"]:
                 log.info(f"{lc.y}❌ Account {account_name} is disabled!{lc.rs}")
                 continue
 
-            FB = FarmBot(log, bot_globals, account_name, web_app_data, proxy, user_agent, None)
+            FB = FarmBot(
+                log, bot_globals, account_name, web_app_data, proxy, user_agent, None
+            )
             await FB.run()
 
         await CheckCD(log)
-
 
 
 if __name__ == "__main__":
