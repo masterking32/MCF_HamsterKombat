@@ -61,7 +61,7 @@ To do this, you need to contact us on Telegram and provide the following informa
 - You need to have a GitHub repository (private/public) for your module.
 - If your GitHub repository is private, you need to add the `@masterking32` user as a collaborator to access the repository.
 
-[Telegram Group](https://t.me/MasterCryptoFarmBotGroup)
+## [Telegram Group](https://t.me/MasterCryptoFarmBotGroup) / [Telegram Channel](https://t.me/MasterCryptoFarmBot)
 
 ---
 
