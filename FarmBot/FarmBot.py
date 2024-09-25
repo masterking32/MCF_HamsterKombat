@@ -22,7 +22,7 @@ class FarmBot:
         log,
         bot_globals,
         account_name,
-        web_app_url,
+        web_app_query,
         proxy=None,
         user_agent=None,
         tg=None,
@@ -30,7 +30,7 @@ class FarmBot:
         self.log = log
         self.bot_globals = bot_globals
         self.account_name = account_name
-        self.web_app_url = web_app_url
+        self.web_app_query = web_app_query
         self.proxy = proxy
         self.tg = tg
         self.user_agent = user_agent
@@ -41,6 +41,6 @@ class FarmBot:
         )
 
         # If self.tg is not None, it means you can use Pyrogram...
-        self.log.info(f"{lc.b}[Development Only] URL: {self.web_app_url}{lc.rs}")
+        self.log.info(f"{lc.b}[Development Only] URL: {self.web_app_query}{lc.rs}")
 
         # Login and other codes here ...

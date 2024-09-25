@@ -86,12 +86,20 @@ async def process_pg_account(account, bot_globals, log):
         await tg.DisconnectClient()
         return
 
+    web_app_query = tg.getTGWebQuery(web_app_data)
+    if not web_app_query:
+        log.error(
+            f"<r>└─ ❌ Account {account['session_name']} WebApp query is not valid!</r>"
+        )
+        await tg.DisconnectClient()
+        return
+
     log.info(f"<g>└─ ✅ Account {account['session_name']} is ready!</g>")
     fb = FarmBot(
         log,
         bot_globals,
         account["session_name"],
-        web_app_data,
+        web_app_query,
         account["proxy"],
         account["user_agent"],
         tg,
@@ -150,13 +158,26 @@ async def main():
             await check_cd(log)
             continue
 
+        tg_tmp = tgAccount()
         for account in json_accounts:
             proxy = account.get("proxy")
             account_name = account.get("session_name", account.get("phone_number"))
             web_app_data = account.get("web_app_data")
+
             user_agent = account.get("user_agent")
             if account.get("disabled"):
                 log.info(f"<y>❌ Account {account_name} is disabled!</y>")
+                continue
+
+            if not web_app_data:
+                log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
+                continue
+
+            web_app_query = tg_tmp.getTGWebQuery(web_app_data)
+            if not web_app_query:
+                log.error(
+                    f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
+                )
                 continue
 
             fb = FarmBot(

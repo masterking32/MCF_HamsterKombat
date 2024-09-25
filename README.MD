@@ -43,7 +43,7 @@ python bot.py
 
 - First, open the `bot.py` file and edit the `tgAccount` parameters.
 
-- Open the `FarmBot/FarmBot.py` file and start coding your module. You have WebQuery (TgWebInitData) ready, which is used to interact with any kind of BotApps. The `self.web_app_url` is the `TgWebInitData` of the WebApp.
+- Open the `FarmBot/FarmBot.py` file and start coding your module. You have WebQuery (TgWebInitData) ready, which is used to interact with any kind of BotApps. The `self.web_app_query` is the `TgWebInitData` of the WebApp.
 
 - Have fun coding your module!
 
