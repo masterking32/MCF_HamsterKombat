@@ -32,10 +32,14 @@ def getConfig(key, default=None):
 
 
 def is_module_disabled(bot_globals, log):
-    db = Database(bot_globals["mcf_dir"] + "/database.db", log)
-    module_name = bot_globals["module_name"]
-    is_disabled = db.getSettings(f"{module_name}_disabled", "0") == "1"
-    return is_disabled == True or is_disabled == "1"
+    try:
+        db = Database(bot_globals["mcf_dir"] + "/database.db", log)
+        module_name = bot_globals["module_name"]
+        is_disabled = db.getSettings(f"{module_name}_disabled", "0") == "1"
+        return is_disabled == True or is_disabled == "1"
+    except Exception as e:
+        log.error(f"Error while checking if module is disabled: {e}")
+        return False
 
 
 def kill_process():
