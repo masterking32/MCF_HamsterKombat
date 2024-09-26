@@ -175,6 +175,14 @@ async def main():
                 await check_cd(log)
                 continue
 
+            log.info(
+                "<g>└─ 👤</g><c>"
+                + str(len(json_accounts))
+                + "</c><g> Module account(s) found!</g>"
+            )
+
+            log.info("<g>🖥️ Start processing module accounts ...</g>")
+
             tg_tmp = tgAccount()
             for account in json_accounts:
                 proxy = account.get("proxy")
