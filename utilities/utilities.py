@@ -10,6 +10,7 @@ import signal
 import sys
 import os
 
+MODULE_DIR = Path(__file__).resolve().parents[1]
 MASTER_CRYPTO_FARM_BOT_DIR = Path(__file__).resolve().parents[3]
 sys.path.append(str(MASTER_CRYPTO_FARM_BOT_DIR))
 
@@ -17,10 +18,12 @@ from utils.database import Database
 
 
 def getConfig(key, default=None):
-    if not os.path.exists("bot_settings.json"):
+    json_file = os.path.join(MODULE_DIR, "bot_settings.json")
+
+    if not os.path.exists(json_file):
         return default
 
-    with open("bot_settings.json", "r") as f:
+    with open(json_file, "r") as f:
         data = json.load(f)
         if key in data:
             return data[key]
