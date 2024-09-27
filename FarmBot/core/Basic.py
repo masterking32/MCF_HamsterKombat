@@ -13,7 +13,7 @@ class Basic:
 
         self.log.info(f"🌍 <y>Getting IP ...</y>")
         response = self.http.get(
-            url="/ip", Allowed_Option_Response_Code=200, with_Auth=False
+            url="/ip", valid_option_response_code=200, auth_header=False
         )
 
         if response is None:
@@ -38,3 +38,68 @@ class Basic:
             return None
 
         return response["interludeUser"]
+
+    def get_promos(self):
+        self.log.info(f"🔄 <y>Getting promos ...</y>")
+
+        response = self.http.post(
+            url="interlude/get-promos",
+        )
+
+        if response is None or "promos" not in response:
+            self.log.error("🔴 <red>Failed to get promos!</red>")
+            return None
+
+        return response
+
+    def get_config(self):
+        self.log.info(f"🔄 <y>Getting config ...</y>")
+
+        response = self.http.post(
+            url="interlude/config",
+        )
+
+        if response is None:
+            self.log.error("🔴 <red>Failed to get config!</red>")
+            return None
+
+        return response
+
+    def get_upgrades_for_buy(self):
+        self.log.info(f"🔄 <y>Getting upgrades ...</y>")
+
+        response = self.http.post(
+            url="interlude/upgrades-for-buy",
+        )
+
+        if response is None or "upgradesForBuy" not in response:
+            self.log.error("🔴 <red>Failed to get upgrades!</red>")
+            return None
+
+        return response
+
+    def get_list_tasks(self):
+        self.log.info(f"🔄 <y>Getting tasks ...</y>")
+
+        response = self.http.post(
+            url="interlude/list-tasks",
+        )
+
+        if response is None or "tasks" not in response:
+            self.log.error("🔴 <red>Failed to get tasks!</red>")
+            return None
+
+        return response
+
+    def get_skin(self):
+        self.log.info(f"🔄 <y>Getting skin ...</y>")
+
+        response = self.http.post(
+            url="interlude/get-skin",
+        )
+
+        if response is None or "skins" not in response:
+            self.log.error("🔴 <red>Failed to get skin!</red>")
+            return None
+
+        return response

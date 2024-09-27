@@ -85,12 +85,30 @@ class FarmBot:
                 f"<g>🔷 Total Diamonds: <c>{totalDiamonds_Short}</c>, Balance Diamonds: <c>{balanceDiamonds_Short}</c>, Earn Passive Per Hour: <c>{earnPassivePerHour_Short}</c></g>"
             )
 
-            # get-promos
-            # config
-            # upgrades-for-buy
-            # list-tasks
-            # get-skin
-            # Start Farming ...
+            get_promos = basic.get_promos()
+            if get_promos is None:
+                return
+
+            get_config = basic.get_config()
+            if get_config is None:
+                return
+
+            upgrades_for_buy = basic.get_upgrades_for_buy()
+            if upgrades_for_buy is None:
+                return
+
+            list_tasks = basic.get_list_tasks()
+            if list_tasks is None:
+                return
+
+            get_skin = basic.get_skin()
+            if get_skin is None:
+                return
+
+            self.log.info(
+                "<g>✅ Sending basic request to the server was successful!</g>"
+            )
+
         except Exception as e:
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
             return False

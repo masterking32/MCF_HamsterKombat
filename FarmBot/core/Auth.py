@@ -24,7 +24,7 @@ class Auth:
                 url="/auth/auth-by-telegram-webapp",
                 payload=json.dumps(HKFingerprint),
                 headers={"authorization": ""},
-                with_Auth=False,
+                auth_header=False,
             )
 
             if (

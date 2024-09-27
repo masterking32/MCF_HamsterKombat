@@ -19,10 +19,11 @@ class HttpRequest:
         self,
         url,
         headers=None,
-        sendOptions=True,
-        Allowed_Response_Code=200,
-        Allowed_Option_Response_Code=204,
-        with_Auth=True,
+        send_option_request=True,
+        valid_response_code=200,
+        valid_option_response_code=204,
+        auth_header=True,
+        retries=3,
     ):
         try:
             default_headers = self._get_default_headers()
@@ -30,15 +31,15 @@ class HttpRequest:
             if headers is None:
                 headers = {}
 
-            if with_Auth and self.authToken:
+            if auth_header and self.authToken:
                 headers["authorization"] = f"Bearer {self.authToken}"
 
             if headers:
                 for key, value in headers.items():
                     default_headers[key] = value
 
-            if sendOptions:
-                self.options(url, "GET", headers, Allowed_Option_Response_Code)
+            if send_option_request:
+                self.options(url, "GET", headers, valid_option_response_code)
 
             response = requests.get(
                 self._fix_url(url),
@@ -46,7 +47,7 @@ class HttpRequest:
                 proxies=self._get_proxy(),
             )
 
-            if response.status_code != Allowed_Response_Code:
+            if response.status_code != valid_response_code:
                 self.log.error(
                     f"🔴 <red> GET Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
@@ -57,6 +58,18 @@ class HttpRequest:
 
             return response.json()
         except Exception as e:
+            if retries > 0:
+                self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
+                return self.get(
+                    url,
+                    headers,
+                    send_option_request,
+                    valid_response_code,
+                    valid_option_response_code,
+                    auth_header,
+                    retries - 1,
+                )
+
             self.log.error(f"🔴 <red> GET Request Error: <y>{url}</y> {e}</red>")
             return None
 
@@ -65,10 +78,11 @@ class HttpRequest:
         url,
         payload=None,
         headers=None,
-        sendOptions=True,
-        Allowed_Response_Code=200,
-        Allowed_Option_Response_Code=204,
-        with_Auth=True,
+        send_option_request=True,
+        valid_response_code=200,
+        valid_option_response_code=204,
+        auth_header=True,
+        retries=3,
     ):
         try:
             default_headers = self._get_default_headers()
@@ -76,15 +90,15 @@ class HttpRequest:
             if headers is None:
                 headers = {}
 
-            if with_Auth and self.authToken is not None:
+            if auth_header and self.authToken is not None:
                 headers["authorization"] = f"Bearer {self.authToken}"
 
             if headers:
                 for key, value in headers.items():
                     default_headers[key] = value
 
-            if sendOptions:
-                self.options(url, "POST", headers, Allowed_Option_Response_Code)
+            if send_option_request:
+                self.options(url, "POST", headers, valid_option_response_code)
             response = None
             if payload:
                 response = requests.post(
@@ -100,7 +114,7 @@ class HttpRequest:
                     proxies=self._get_proxy(),
                 )
 
-            if response.status_code != Allowed_Response_Code:
+            if response.status_code != valid_response_code:
                 self.log.error(
                     f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
@@ -111,10 +125,21 @@ class HttpRequest:
 
             return response.json()
         except Exception as e:
+            if retries > 0:
+                self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
+                return self.get(
+                    url,
+                    headers,
+                    send_option_request,
+                    valid_response_code,
+                    valid_option_response_code,
+                    auth_header,
+                    retries - 1,
+                )
             self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
             return None
 
-    def options(self, url, method, headers=None, Allowed_Response_Code=204):
+    def options(self, url, method, headers=None, valid_response_code=204):
         try:
             default_headers = self._get_get_option_headers(headers, method)
             response = requests.options(
@@ -123,7 +148,7 @@ class HttpRequest:
                 proxies=self._get_proxy(),
             )
 
-            if response.status_code != Allowed_Response_Code:
+            if response.status_code != valid_response_code:
                 self.log.error(
                     f"🔴 <red> OPTIONS Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
