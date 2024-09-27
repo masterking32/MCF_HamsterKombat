@@ -7,13 +7,26 @@ import requests
 
 
 class HttpRequest:
-    def __init__(self, log, proxy=None, user_agent=None):
+    def __init__(
+        self,
+        log,
+        proxy=None,
+        user_agent=None,
+    ):
         self.log = log
         self.proxy = proxy
         self.user_agent = user_agent
         self.game_url = "https://api.hamsterkombatgame.io"
         self.configVersion = None
         self.authToken = None
+
+        if not self.user_agent or self.user_agent == "":
+            self.user_agent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.3"
+
+        if "windows" in self.user_agent.lower():
+            self.log.warning(
+                "🟡 <y>Windows User Agent detected, For safety please use mobile user-agent</y>"
+            )
 
     def get(
         self,
