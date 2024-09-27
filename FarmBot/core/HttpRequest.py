@@ -2,7 +2,7 @@
 # Date: 2024
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
-import json
+
 import requests
 
 
