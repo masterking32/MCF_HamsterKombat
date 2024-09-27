@@ -41,10 +41,10 @@ async def check_cd(log):
 
 
 # Edit the following variables
-BOT_ID = "myuseragent_bot"
-REFERRAL_TOKEN = "ref_masterking32"
+BOT_ID = "hamster_kombat_bot"
+REFERRAL_TOKEN = "kentId95736407"
 SHORT_APP_NAME = None
-APP_URL = "https://api.masterking32.com/telegram_useragent.php"
+APP_URL = "https://hamsterkombatgame.io/"
 # End of variables to edit
 
 
