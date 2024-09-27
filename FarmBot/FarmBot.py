@@ -5,6 +5,7 @@
 import sys
 import os
 
+from utilities.utilities import getConfig
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -83,7 +84,7 @@ class FarmBot:
             balanceDiamonds_Short = "{:.2f}".format(balanceDiamonds)
             earnPassivePerHour_Short = "{:.2f}".format(earnPassivePerHour)
             self.log.info(
-                f"<g>🔷 Total Diamonds: <c>{totalDiamonds_Short}</c>, Balance Diamonds: <c>{balanceDiamonds_Short}</c>, Earn Passive Per Hour: <c>{earnPassivePerHour_Short}</c></g>"
+                f"<g>🔷 Total Diamonds: <c>{totalDiamonds_Short}💎</c>, Balance Diamonds: <c>{balanceDiamonds_Short}💎</c>, Earn Passive Per Hour: <c>{earnPassivePerHour_Short}</c></g>"
             )
 
             get_promos = basic.get_promos()
@@ -111,9 +112,8 @@ class FarmBot:
             )
 
             cards = Cards(self.log, self.http)
-            available_cards = cards.get_available_cards(
-                upgrades_for_buy["upgradesForBuy"]
-            )
+            if getConfig("FarmBot", "auto_upgrade"):
+                cards.start_upgrades(balanceDiamonds)
 
         except Exception as e:
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
