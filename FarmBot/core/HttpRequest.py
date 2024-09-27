@@ -163,12 +163,12 @@ class HttpRequest:
         }
 
         if "android" in self.user_agent.lower():
-            headers["HTTP_SEC_CH_UA_PLATFORM"] = '"Android"'
-            headers["HTTP_SEC_CH_UA_MOBILE"] = "?1"
-            headers["HTTP_SEC_CH_UA"] = (
-                '"Android WebView";v="125", "Chromium";v="125", "Not.A/Brand";v="24"'
+            headers["Sec-CH-UA-Platform"] = '"Android"'
+            headers["Sec-CH-UA-Mobile"] = "?1"
+            headers["Sec-CH-UA"] = (
+                '"Chromium";v="128", "Not;A=Brand";v="24", "Android WebView";v="128"'
             )
-            headers["HTTP_X_REQUESTED_WITH"] = "org.telegram.messenger.web"
+            headers["X-Requested-With"] = "org.telegram.messenger"
 
         return headers
 
