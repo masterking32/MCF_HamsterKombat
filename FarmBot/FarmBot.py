@@ -25,22 +25,26 @@ class FarmBot:
         web_app_query,
         proxy=None,
         user_agent=None,
-        tg=None,
+        isPyrogram=False,
+        tgAccount=None,
     ):
         self.log = log
         self.bot_globals = bot_globals
         self.account_name = account_name
         self.web_app_query = web_app_query
         self.proxy = proxy
-        self.tg = tg
         self.user_agent = user_agent
+        self.isPyrogram = isPyrogram
+        self.tgAccount = tgAccount
 
     async def run(self):
         self.log.info(
-            f"{lc.g}🤖 Farming is starting for account {lc.rs + lc.c + self.account_name + lc.rs + lc.g}...{lc.rs}"
+            f"<g>🤖 Farming is starting for account <cyan>{self.account_name}</cyan>...</g>"
         )
 
         # If self.tg is not None, it means you can use Pyrogram...
-        self.log.info(f"{lc.b}[Development Only] URL: {self.web_app_query}{lc.rs}")
+        self.log.info(
+            f"<blue>[Development Only] URL: <c>{self.web_app_query}</c></blue>"
+        )
 
         # Login and other codes here ...

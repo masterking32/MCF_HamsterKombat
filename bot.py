@@ -88,15 +88,9 @@ async def process_pg_account(account, bot_globals, log):
             SHORT_APP_NAME,
             APP_URL,
         )
-        tg_run_status = await tg.run()
-        if not tg_run_status:
-            log.error(f"<r>└─ ❌ Account {account['session_name']} is not ready!</r>")
-            return
-
-        web_app_data = await tg.getWebViewData()
+        web_app_data = await tg.run()
         if not web_app_data:
             log.error(f"<r>└─ ❌ Account {account['session_name']} is not ready!</r>")
-            await tg.DisconnectClient()
             return
 
         web_app_query = tg.getTGWebQuery(web_app_data)
@@ -104,7 +98,6 @@ async def process_pg_account(account, bot_globals, log):
             log.error(
                 f"<r>└─ ❌ Account {account['session_name']} WebApp query is not valid!</r>"
             )
-            await tg.DisconnectClient()
             return
 
         log.info(f"<g>└─ ✅ Account {account['session_name']} is ready!</g>")
@@ -115,10 +108,10 @@ async def process_pg_account(account, bot_globals, log):
             web_app_query,
             account["proxy"],
             account["user_agent"],
+            True,
             tg,
         )
         await fb.run()
-        await tg.DisconnectClient()
     except Exception as e:
         log.error(f"<r>❌ Error processing Pyrogram account: {e}</r>")
         return False
@@ -212,7 +205,7 @@ async def main():
                     web_app_data,
                     proxy,
                     user_agent,
-                    None,
+                    False,
                 )
                 await fb.run()
 
