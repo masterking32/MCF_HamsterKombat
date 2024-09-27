@@ -12,5 +12,14 @@
     "type": "checkbox",
     "default_value": "on",
     "description": "Automatically finish tasks (Youtube, Twitter, etc)."
+  },
+  {
+    "key": "upgrade_coefficient",
+    "name": "Upgrade Coefficient",
+    "type": "number",
+    "default_value": 200,
+    "description": "Max Diamond spent to profit per hour ratio. (Price to upgrade / profit per hour)",
+    "min": 1,
+    "max": 500
   }
 ]

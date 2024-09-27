@@ -13,6 +13,7 @@ sys.path.append(MasterCryptoFarmBot_Dir)
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.Basic import Basic
+from .core.Cards import Cards
 
 
 class FarmBot:
@@ -107,6 +108,11 @@ class FarmBot:
 
             self.log.info(
                 "<g>✅ Sending basic request to the server was successful!</g>"
+            )
+
+            cards = Cards(self.log, self.http)
+            available_cards = cards.get_available_cards(
+                upgrades_for_buy["upgradesForBuy"]
             )
 
         except Exception as e:

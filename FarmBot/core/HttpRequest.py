@@ -139,7 +139,7 @@ class HttpRequest:
             self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
             return None
 
-    def options(self, url, method, headers=None, valid_response_code=204):
+    def options(self, url, method, headers=None, valid_response_code=204, retries=3):
         try:
             default_headers = self._get_get_option_headers(headers, method)
             response = requests.options(
@@ -156,6 +156,11 @@ class HttpRequest:
 
             return True
         except Exception as e:
+            if retries > 0:
+                self.log.info(f"🟡 <y> Unable to send option request, retrying...</y>")
+                return self.options(
+                    url, method, headers, valid_response_code, retries - 1
+                )
             self.log.error(f"🔴 <red> OPTIONS Request Error: <y>{url}</y> {e}</red>")
             return None
 
