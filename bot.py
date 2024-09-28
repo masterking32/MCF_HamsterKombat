@@ -3,6 +3,7 @@
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
 
+import random
 import signal
 import sys
 import os
@@ -38,6 +39,9 @@ except Exception as e:
 async def check_cd(log):
     log.info(f"<y>💤 Checking again in </y><c>{CHECK_INTERVAL}</c><y> seconds ...</y>")
     await asyncio.sleep(CHECK_INTERVAL)
+    random_wait = random.randint(60, 120)
+    log.info(f"<y>💤 Random wait for </y><c>{random_wait}</c><y> seconds ...</y>")
+    await asyncio.sleep(random_wait)
 
 
 # Edit the following variables
