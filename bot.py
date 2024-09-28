@@ -183,7 +183,7 @@ async def main():
             tg_tmp = tgAccount()
             for account in json_accounts:
                 proxy = account.get("proxy")
-                account_name = account.get("session_name", account.get("phone_number"))
+                account_name = account.get("session_name")
                 web_app_data = account.get("web_app_data")
 
                 user_agent = account.get("user_agent")
