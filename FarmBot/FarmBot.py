@@ -17,6 +17,7 @@ from .core.Auth import Auth
 from .core.Basic import Basic
 from .core.Cards import Cards
 from .core.Tasks import Tasks
+from .core.Playground import Playground
 
 
 class FarmBot:
@@ -138,6 +139,9 @@ class FarmBot:
             else:
                 self.log.info("<y>🔔 Auto tasks is disabled!</y>")
 
+            if getConfig("auto_playground", True):
+                playground = Playground(self.log, self.http)
+                playground.claim_random()
             self.log.info(
                 f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
             )
