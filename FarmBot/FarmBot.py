@@ -122,8 +122,10 @@ class FarmBot:
             )
 
             cards = Cards(self.log, self.http)
-            if getConfig("FarmBot", "auto_upgrade"):
+            if getConfig("auto_upgrade", True):
                 cards.start_upgrades(balanceDiamonds)
+            else:
+                self.log.info("<y>🔔 Auto upgrade is disabled!</y>")
 
             tasks = Tasks(
                 self.log,
@@ -131,9 +133,14 @@ class FarmBot:
                 v_config_data["config"]["tasks"],
                 list_tasks["tasks"],
             )
-            if getConfig("FarmBot", "auto_tasks"):
+            if getConfig("auto_tasks", True):
                 tasks.start_tasks()
+            else:
+                self.log.info("<y>🔔 Auto tasks is disabled!</y>")
 
+            self.log.info(
+                f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
+            )
         except Exception as e:
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
             return False
