@@ -57,9 +57,24 @@ class Playground:
         if promo_key is None:
             return
 
-        # send request to claim promo
-
+        self.apply_promo(promo_key)
         self.log.info(f"✅ <g>Claimed Playground <y>{promo['title']['en']}</y>!</g>")
+
+    def apply_promo(self, promoCode):
+        self.log.info(f"🎲 <y>Applying promo code <g>{promoCode}</g>...</y>")
+
+        response = self.http.post(
+            url="interlude/apply-promo",
+            payload=json.dumps({"promoCode": promoCode}),
+        )
+
+        if response is None or "reward" not in response:
+            self.log.error(
+                f"🔴 <red>Failed to apply promo code <y>{promoCode}</y>!</red>"
+            )
+            return
+
+        self.log.info(f"✅ <g>Applied promo code <y>{promoCode}</y>!</g>")
 
     def generate_promo_key(self, promo_id):
         try:
@@ -74,7 +89,7 @@ class Playground:
             if promo_code is None:
                 return None
 
-            self.log.info(f"💤 <y>Sleeping for {promo_game['delay']}...</y>")
+            self.log.info(f"💤 <y>Sleeping for {promo_game['delay']} secs ...</y>")
             time.sleep(promo_game["delay"])
 
             self.log.info(
