@@ -4,4 +4,6 @@ bot_settings.json
 *.log
 *.txt
 accounts.json
+disabled_sessions.json
 tokens.json
+module_data.json
