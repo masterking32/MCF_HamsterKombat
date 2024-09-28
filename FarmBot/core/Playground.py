@@ -7,6 +7,7 @@ import json
 import random
 import time
 import uuid
+import string
 from .Basic import Basic
 from .PromoGames import PromoGames
 
@@ -16,6 +17,7 @@ class Playground:
         self.log = log
         self.http = HttpRequest
         self.basic = Basic(log, HttpRequest)
+        self.performed_in_loop = []
 
     def claim_random(self):
         try:
@@ -29,9 +31,16 @@ class Playground:
             if not promos or len(promos) == 0:
                 self.log.error("🔴 <red>No promos to claim!</red>")
                 return
-
-            promo = random.choice(promos)
-            self.claim_promo(promo)
+            
+            """
+            TODO: Implement normal cycle
+            perhaps it is worth saving the keys received and activating them on the next account cycle?
+            """
+            while len(self.performed_in_loop) < len(promos):
+                promo = random.choice(promos)
+                if promo["promoId"] in self.performed_in_loop:
+                    continue
+                self.claim_promo(promo)
         except Exception as e:
             self.log.error(f"🔴 <red>Error claiming random Playground: {e}</red>")
 
@@ -66,17 +75,21 @@ class Playground:
             self.log.info(
                 f"🔄 <y>Claiming Playground <g>{promo['title']['en']}</g>...</y>"
             )
-            promo_key = self.generate_promo_key(promo["promoId"])
-            if promo_key is None:
+            promo_response = self.generate_promo_key(promo["promoId"])
+            if promo_response is None:
+                return False
+            
+            if not promo_response.get("promoCode"):
                 return False
 
-            resp = self.apply_promo(promo_key)
+            resp = self.apply_promo(promo_response.get("promoCode"))
             if not resp:
                 return False
 
             self.log.info(
                 f"✅ <g>Claimed Playground <y>{promo['title']['en']}</y>!</g>"
             )
+            self.performed_in_loop.append(promo["promoId"])
             return True
         except Exception as e:
             self.log.error(f"🔴 <red>Error claiming Playground: {e}</red>")
@@ -108,8 +121,10 @@ class Playground:
             if clientToken is None:
                 return None
 
-            promo_code = self._promo_create_code(promo_id, clientToken)
-            if promo_code is None:
+            time.sleep(2)
+
+            promo_response = self._promo_create_code(promo_id, clientToken)
+            if promo_response is None:
                 return None
 
             self.log.info(f"💤 <y>Sleeping for {promo_game['delay']} secs ...</y>")
@@ -145,14 +160,14 @@ class Playground:
             self.log.info(
                 f"🏓 <g>Proceeding to the final step of key generation...</g>"
             )
-            promo_code = self._promo_create_code(promo_id, clientToken)
-            if promo_code is None:
+            promo_response = self._promo_create_code(promo_id, clientToken)
+            if promo_response is None:
                 return None
 
             self.log.info(
-                f"🔑 <g>Generated promo key for <y>{promo_name}</y>: <c>{promo_code}</c></g>"
+                f"🔑 <g>Generated promo key for <y>{promo_name}</y>: <c>{promo_response['promoCode']}</c></g>"
             )
-            return promo_code
+            return promo_response
         except Exception as e:
             self.log.error(f"🔴 <red>Error generating promo key: {e}</red>")
             return None
@@ -161,16 +176,41 @@ class Playground:
         promo_game = PromoGames[promo_id]
         promo_name = promo_game["name"]
         promo_id = promo_game["promoId"]
+        response = None
         self.log.info(f"🔄 <y>Registering event for <g>{promo_name}</g>...</y>")
 
-        headers = self._get_promo_headers(promo_id)
-        headers["authorization"] = f"Bearer {clientToken}"
-        response = self.http.post(
-            url="https://api.gamepromo.io/promo/register-event",
-            payload=json.dumps(self._get_register_event_payload(promo_id)),
-            headers=headers,
-            auth_header=False,
-        )
+        url = "https://api.gamepromo.io/promo/register-event"
+        if promo_game.get("newApi"):
+            url = "https://api.gamepromo.io/promo/1/register-event"
+
+        if promo_id == "dc128d28-c45b-411c-98ff-ac7726fbaea4": # Merge Away
+            headers=self._get_promo_headers(promo_id, "OPTIONS")
+            headers["access-control-request-headers"] = "authorization,content-type"
+            response = self.http.options(
+                url=url,
+                method="OPTIONS",
+                headers=headers,
+                valid_response_code=204,
+            )
+            headers=self._get_promo_headers(promo_id, "POST")
+            headers["authorization"] = f"Bearer {clientToken}"
+            response = self.http.post(
+                url=url,
+                payload=json.dumps(self._get_register_event_payload(promo_id)),
+                headers=headers,
+                auth_header=False,
+                send_option_request=False,
+            )
+        else:
+            headers = self._get_promo_headers(promo_id)
+            headers["authorization"] = f"Bearer {clientToken}"
+            response = self.http.post(
+                url=url,
+                payload=json.dumps(self._get_register_event_payload(promo_id)),
+                headers=headers,
+                auth_header=False,
+                send_option_request=False,
+            )
 
         if response is None or "hasCode" not in response:
             return False
@@ -181,16 +221,41 @@ class Playground:
         promo_game = PromoGames[promo_id]
         promo_name = promo_game["name"]
         promo_id = promo_game["promoId"]
+        response = None
         self.log.info(f"⚙️ <y>Creating code for <g>{promo_name}</g>...</y>")
 
-        headers = self._get_promo_headers(promo_id)
-        headers["authorization"] = f"Bearer {clientToken}"
-        response = self.http.post(
-            url="https://api.gamepromo.io/promo/create-code",
-            payload=json.dumps({"promoId": promo_id}),
-            headers=headers,
-            auth_header=False,
-        )
+        url="https://api.gamepromo.io/promo/create-code"
+        if promo_game.get("newApi"):
+            url="https://api.gamepromo.io/promo/1/create-code"
+
+        if promo_id == "dc128d28-c45b-411c-98ff-ac7726fbaea4": # Merge Away
+            headers=self._get_promo_headers(promo_id, "OPTIONS")
+            headers["access-control-request-headers"] = "authorization,content-type"
+            response = self.http.options(
+                url=url,
+                method="OPTIONS",
+                headers=headers,
+                valid_response_code=204,
+            )
+            headers=self._get_promo_headers(promo_id, "POST")
+            headers["authorization"] = f"Bearer {clientToken}"
+            response = self.http.post(
+                url=url,
+                payload=json.dumps({"promoId": promo_id}),
+                headers=headers,
+                auth_header=False,
+                send_option_request=False,
+            )
+        else:
+            headers = self._get_promo_headers(promo_id)
+            headers["authorization"] = f"Bearer {clientToken}"
+            response = self.http.post(
+                url=url,
+                payload=json.dumps({"promoId": promo_id}),
+                headers=headers,
+                auth_header=False,
+                send_option_request=False,
+            )
 
         if response is None or "promoCode" not in response:
             self.log.error(
@@ -198,21 +263,43 @@ class Playground:
             )
             return None
 
-        return response["promoCode"]
+        return response
 
     def _promo_login(self, promo_id):
         promo_game = PromoGames[promo_id]
         promo_name = promo_game["name"]
         promo_id = promo_game["promoId"]
         self.log.info(f"🔐 <y>Logging in to <g>{promo_name}</g>...</y>")
+        
+        url = "https://api.gamepromo.io/promo/login-client"
+        if promo_game.get("newApi"):
+            url = "https://api.gamepromo.io/promo/1/login-client"
 
-        response = self.http.post(
-            url="https://api.gamepromo.io/promo/login-client",
-            payload=json.dumps(self._get_login_payload(promo_id)),
-            headers=self._get_promo_headers(promo_id),
-            auth_header=False,
-            send_option_request=False,
-        )
+        if promo_id == "dc128d28-c45b-411c-98ff-ac7726fbaea4": # Merge Away
+            headers=self._get_promo_headers(promo_id, "OPTIONS")
+            headers["access-control-request-headers"] = "content-type"
+            response = self.http.options(
+                url=url,
+                method="OPTIONS",
+                headers=headers,
+                valid_response_code=204,
+            )
+            headers=self._get_promo_headers(promo_id, "POST")
+            response = self.http.post(
+                url=url,
+                payload=json.dumps(self._get_login_payload(promo_id)),
+                headers=headers,
+                auth_header=False,
+                send_option_request=False,
+            )
+        else:
+            response = self.http.post(
+                url=url,
+                payload=json.dumps(self._get_login_payload(promo_id)),
+                headers=self._get_promo_headers(promo_id),
+                auth_header=False,
+                send_option_request=False,
+            )
 
         if response is None or "clientToken" not in response:
             self.log.error(f"🔴 <red>Failed to login to <y>{promo_name}</y>!</red>")
@@ -223,9 +310,18 @@ class Playground:
     def _generate_id(self, type=None):
         if type is None or type == "uuid":
             return str(uuid.uuid4())
-
-        if type == "7digits":
-            return str(random.randint(1000000, 1999999))
+        elif type == "7digits":
+            # return str(random.randint(1000000, 1999999))
+            return "".join(random.choices(string.digits, k=7))
+        elif type == "32strLower":
+            return "".join(random.choices(string.ascii_letters + string.digits, k=32)).lower()
+        elif type == "16strUpper":
+            return "".join(random.choices(string.ascii_letters + string.digits, k=16)).upper()
+        elif type == "ts-19digits":
+            return f"{int(time.time() * 1000)}-" + "".join(random.choices(string.digits, k=19))
+        else:
+            return type
+        
 
     def _get_register_event_payload(self, promo_id):
         promo_game = PromoGames[promo_id]
@@ -240,7 +336,9 @@ class Playground:
         if "eventType" in promo_game:
             payload["eventType"] = promo_game["eventType"]
 
-        return payload
+        cleaned_payload = {key: value for key, value in payload.items() if value} # remove params with None and "" values
+
+        return cleaned_payload
 
     def _get_login_payload(self, promo_id):
         promo_game = PromoGames[promo_id]
@@ -256,28 +354,34 @@ class Playground:
         if "clientVersion" in promo_game:
             payload["clientVersion"] = promo_game["clientVersion"]
 
-        return payload
+        cleaned_payload = {key: value for key, value in payload.items() if value} # remove params with None and "" values
 
-    def _get_promo_headers(self, promo_id):
+        return cleaned_payload
+
+    def _get_promo_headers(self, promo_id, method=None):
         promo_game = PromoGames[promo_id]
         headers = {
             "accept": "*/*",
-            "authorization": "Bearer",
-            "Content-Type": "application/json",
-            "Host": "api.gamepromo.io",
-            "Origin": None,
-            "Referer": None,
-            "Sec-Fetch-Dest": None,
-            "Sec-Fetch-Mode": None,
-            "Sec-Fetch-Site": None,
+            "content-type": "application/json; charset=utf-8",
+            "host": "api.gamepromo.io",
+            "origin": None,
+            "referer": None,
+            "sec-fetch-dest": None,
+            "sec-fetch-mode": None,
+            "sec-fetch-site": None,
             "pragma": None,
             "cache-control": None,
         }
 
-        if "userAgent" in promo_game:
-            headers["user-agent"] = promo_game["userAgent"]
+        if promo_game.get("headers"):
+            headers.update(promo_game["headers"])
 
-        if "x-unity-version" in promo_game:
-            headers["x-unity-version"] = promo_game["x-unity-version"]
+        if method and method.upper() == "OPTIONS" and "optionsHeaders" in promo_game:
+            headers.update(promo_game["optionsHeaders"])
+
+        if method and method.upper() == "POST" and "postHeaders" in promo_game:
+            headers.update(promo_game["postHeaders"])
+
+        # cleaned_headers = {key: value for key, value in headers.items() if value} # remove headers with None and "" values
 
         return headers
