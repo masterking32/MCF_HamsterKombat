@@ -51,6 +51,7 @@ class FarmBot:
 
             self.http = HttpRequest(self.log, self.proxy, self.user_agent)
             basic = Basic(self.log, self.http)
+
             ip = basic.ip()
             if ip is None:
                 return
@@ -140,8 +141,17 @@ class FarmBot:
                 self.log.info("<y>🔔 Auto tasks is disabled!</y>")
 
             if getConfig("auto_playground", True):
-                playground = Playground(self.log, self.http)
-                playground.claim_random()
+                self.log.info(
+                    f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
+                )
+                return
+
+            if self.proxy is None:
+                self.log.warning(
+                    "<y>🔔 If you have more than 5 accounts, make sure to use proxies for your accounts.</y>"
+                )
+            playground = Playground(self.log, self.http)
+            playground.claim_random()
             self.log.info(
                 f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
             )
