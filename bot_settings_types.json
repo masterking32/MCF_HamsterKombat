@@ -1,12 +1,5 @@
 [
   {
-    "key": "auto_upgrade",
-    "name": "Auto Upgrade",
-    "type": "checkbox",
-    "default_value": "on",
-    "description": "Automatically upgrade your hamster cards."
-  },
-  {
     "key": "auto_tasks",
     "name": "Auto Finish Tasks",
     "type": "checkbox",
@@ -14,12 +7,26 @@
     "description": "Automatically finish tasks (Youtube, Twitter, etc)."
   },
   {
-    "key": "upgrade_coefficient",
-    "name": "Upgrade Coefficient",
-    "type": "number",
-    "default_value": 200,
-    "description": "Max Diamond spent to profit per hour ratio. (Price to upgrade / profit per hour)",
-    "min": 1,
-    "max": 500
+    "key": "auto_playground",
+    "name": "Auto Playground",
+    "type": "checkbox",
+    "default_value": "on",
+    "description": "Automatically play playground games, one game per each run cycle."
+  },
+  {
+    "key": "auto_upgrade",
+    "name": "Auto Upgrade",
+    "type": "checkbox",
+    "default_value": "on",
+    "description": "Automatically upgrade your hamster cards."
+  },
+  {
+    "key": "check_interval",
+    "name": "Check Interval",
+    "type": "range",
+    "default_value": 300,
+    "description": "Interval in seconds to check accounts.",
+    "min": 300,
+    "max": 3600
   }
 ]
