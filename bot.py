@@ -121,6 +121,19 @@ async def process_pg_account(account, bot_globals, log):
         return False
 
 
+def get_disabled_sessions():
+    if not os.path.exists("disabled_sessions.json"):
+        return []
+
+    try:
+        with open("disabled_sessions.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        pass
+
+    return []
+
+
 async def main():
     module_dir = Path(__file__).resolve().parent
     module_name = module_dir.name
@@ -156,7 +169,13 @@ async def main():
     while True:
         try:
             log.info("<g>🖥️ Start processing Pyrogram accounts ...</g>")
+            disabled_sessions = get_disabled_sessions()
             for account in accounts:
+                if account["session_name"] in disabled_sessions:
+                    log.info(
+                        f"<y>❌ Account {account['session_name']} is disabled!</y>"
+                    )
+                    continue
                 await process_pg_account(account, bot_globals, log)
 
             if not Path("accounts.json").exists():
