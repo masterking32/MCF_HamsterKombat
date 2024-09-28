@@ -11,6 +11,7 @@ MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
 )
 sys.path.append(MasterCryptoFarmBot_Dir)
+
 from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.Basic import Basic
@@ -62,8 +63,8 @@ class FarmBot:
 
             self.http.authToken = self.authToken
 
-            account_info = auth.get_account_info()
-            if account_info is None:
+            account_info, interlude_config_version = auth.get_account_info()
+            if account_info is None or interlude_config_version is None:
                 return
 
             sync = basic.get_sync()
@@ -80,19 +81,23 @@ class FarmBot:
             achievements = sync["achievements"]
             promos = sync["promos"]
 
-            totalDiamonds_Short = "{:.2f}".format(totalDiamonds)
-            balanceDiamonds_Short = "{:.2f}".format(balanceDiamonds)
-            earnPassivePerHour_Short = "{:.2f}".format(earnPassivePerHour)
+            totalDiamonds_short = "{:.2f}".format(totalDiamonds)
+            balanceDiamonds_short = "{:.2f}".format(balanceDiamonds)
+            earnPassivePerHour_short = "{:.2f}".format(earnPassivePerHour)
             self.log.info(
-                f"<g>🔷 Total Diamonds: <c>{totalDiamonds_Short}💎</c>, Balance Diamonds: <c>{balanceDiamonds_Short}💎</c>, Earn Passive Per Hour: <c>{earnPassivePerHour_Short}</c></g>"
+                f"<g>🔷 Total Diamonds: <c>{totalDiamonds_short}💎</c>, Balance Diamonds: <c>{balanceDiamonds_short}💎</c>, Earn Passive Per Hour: <c>{earnPassivePerHour_short}</c></g>"
             )
 
             get_promos = basic.get_promos()
             if get_promos is None:
                 return
 
+            v_config_data = basic.get_version_config(interlude_config_version)
+            if v_config_data is None or "config" not in v_config_data:
+                return
+
             get_config = basic.get_config()
-            if get_config is None:
+            if get_config is None or "dailyKeysMiniGames" not in get_config:
                 return
 
             upgrades_for_buy = basic.get_upgrades_for_buy()
@@ -101,6 +106,10 @@ class FarmBot:
 
             list_tasks = basic.get_list_tasks()
             if list_tasks is None:
+                return
+
+            listing = basic.get_list()
+            if listing is None:
                 return
 
             get_skin = basic.get_skin()

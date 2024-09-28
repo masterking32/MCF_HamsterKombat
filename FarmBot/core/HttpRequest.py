@@ -17,7 +17,6 @@ class HttpRequest:
         self.proxy = proxy
         self.user_agent = user_agent
         self.game_url = "https://api.hamsterkombatgame.io"
-        self.configVersion = None
         self.authToken = None
 
         if not self.user_agent or self.user_agent == "":
@@ -36,6 +35,7 @@ class HttpRequest:
         valid_response_code=200,
         valid_option_response_code=204,
         auth_header=True,
+        return_headers=False,
         retries=3,
     ):
         try:
@@ -64,12 +64,13 @@ class HttpRequest:
                 self.log.error(
                     f"🔴 <red> GET Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
-                return None
+                return (None, None) if return_headers else None
 
-            if "config-version" in response.headers:
-                self.configVersion = response.headers["config-version"]
-
-            return response.json()
+            return (
+                (response.json(), response.headers)
+                if return_headers
+                else response.json()
+            )
         except Exception as e:
             if retries > 0:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
@@ -80,11 +81,12 @@ class HttpRequest:
                     valid_response_code,
                     valid_option_response_code,
                     auth_header,
+                    return_headers,
                     retries - 1,
                 )
 
             self.log.error(f"🔴 <red> GET Request Error: <y>{url}</y> {e}</red>")
-            return None
+            return (None, None) if return_headers else None
 
     def post(
         self,
@@ -95,6 +97,7 @@ class HttpRequest:
         valid_response_code=200,
         valid_option_response_code=204,
         auth_header=True,
+        return_headers=False,
         retries=3,
     ):
         try:
@@ -131,26 +134,30 @@ class HttpRequest:
                 self.log.error(
                     f"🔴 <red> POST Request Error: <y>{url}</y> Response code: {response.status_code}</red>"
                 )
-                return None
+                return (None, None) if return_headers else None
 
-            if "config-version" in response.headers:
-                self.configVersion = response.headers["config-version"]
-
-            return response.json()
+            return (
+                (response.json(), response.headers)
+                if return_headers
+                else response.json()
+            )
         except Exception as e:
             if retries > 0:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
-                return self.get(
+                return self.post(
                     url,
+                    payload,
                     headers,
                     send_option_request,
                     valid_response_code,
                     valid_option_response_code,
                     auth_header,
+                    return_headers,
                     retries - 1,
                 )
+
             self.log.error(f"🔴 <red> POST Request Error: <y>{url}</y> {e}</red>")
-            return None
+            return (None, None) if return_headers else None
 
     def options(self, url, method, headers=None, valid_response_code=204, retries=3):
         try:

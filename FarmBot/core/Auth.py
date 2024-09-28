@@ -46,16 +46,22 @@ class Auth:
 
     def get_account_info(self):
         self.log.info(f"🗒️ <y>Getting account info ...</y>")
-        response = self.http.post(
+        response, headers = self.http.post(
             url="auth/account-info",
+            return_headers=True,
         )
 
         if response is None or "accountInfo" not in response:
             self.log.error("🔴 <red>Failed to get account info!</red>")
-            return None
+            return None, None
 
         date = response["accountInfo"]["at"].split("T")[0].replace("-", "/")
         self.log.info(
             f"🗒️ <g>Account ID: <c>{response['accountInfo']['id']}</c>, Join Date: <c>{date}</c></g>"
         )
-        return response
+
+        if headers is None:
+            self.log.error("🔴 <red>Failed to get account info headers!</red>")
+            return None, None
+
+        return response, headers["interlude-config-version"]

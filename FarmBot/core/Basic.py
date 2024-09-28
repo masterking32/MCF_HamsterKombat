@@ -59,7 +59,20 @@ class Basic:
             url="interlude/config",
         )
 
-        if response is None:
+        if response is None or "dailyKeysMiniGames" not in response:
+            self.log.error("🔴 <red>Failed to get config!</red>")
+            return None
+
+        return response
+
+    def get_version_config(self, version):
+        self.log.info(f"🔄 <y>Getting config <c>{version}</c> ...</y>")
+
+        response = self.http.get(
+            url=f"interlude/config/{version}",
+        )
+
+        if response is None and "config" not in response:
             self.log.error("🔴 <red>Failed to get config!</red>")
             return None
 
@@ -100,6 +113,19 @@ class Basic:
 
         if response is None or "skins" not in response:
             self.log.error("🔴 <red>Failed to get skin!</red>")
+            return None
+
+        return response
+
+    def get_list(self):
+        self.log.info(f"🔄 <y>Getting list ...</y>")
+
+        response = self.http.post(
+            url="interlude/withdraw/list",
+        )
+
+        if response is None:
+            self.log.error("🔴 <red>Failed to get list!</red>")
             return None
 
         return response
