@@ -103,8 +103,6 @@ PromoGames = {
         "headers": {
             "accept": None,
             "content-type": "application/json",
-            # TODO: Device based, i suppose, but not the same as web view user-agent
-            "user-agent": "Dalvik/2.1.0 (Linux; U; Android 9; NE2211 Build/SKQ1.220617.001)",
         },
         "clientOrigin": "android",
         "clientIdType": "16strUpper",
@@ -326,8 +324,6 @@ PromoGames = {
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "cross-site",
-            # TODO: value is not same as web view user-agent
-            "user-agent": "Mozilla/5.0 (Linux; Android 9; NE2211 Build/SKQ1.220617.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/129.0.6668.70 Mobile Safari/537.36",
             "x-requested-with": "games.playpack.mergeaway",
         },
         "optionsHeaders": {

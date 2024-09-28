@@ -41,7 +41,7 @@ class HttpRequest:
         try:
             url = self._fix_url(url)
             default_headers = (
-                self._get_default_headers() if "hamsterkombatgame.io" not in url else {}
+                self._get_default_headers() if "hamsterkombatgame.io" in url else {}
             )
 
             if headers is None:
@@ -106,7 +106,7 @@ class HttpRequest:
         try:
             url = self._fix_url(url)
             default_headers = (
-                self._get_default_headers() if "hamsterkombatgame.io" not in url else {}
+                self._get_default_headers() if "hamsterkombatgame.io" in url else {}
             )
 
             if headers is None:
