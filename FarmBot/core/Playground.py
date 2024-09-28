@@ -18,47 +18,69 @@ class Playground:
         self.basic = Basic(log, HttpRequest)
 
     def claim_random(self):
-        self.log.info(f"🕹️ <y>Claiming random Playground...</y>")
+        try:
+            self.log.info(f"🕹️ <y>Claiming random Playground...</y>")
 
-        promos = self.basic.get_promos()
-        if promos is None:
-            return
+            promos = self.basic.get_promos()
+            if promos is None:
+                return
 
-        promos = self.clean_promos(promos)
-        if not promos:
-            self.log.error("🔴 <red>No promos to claim!</red>")
-            return
+            promos = self.clean_promos(promos)
+            if not promos or len(promos) == 0:
+                self.log.error("🔴 <red>No promos to claim!</red>")
+                return
 
-        random_promo = random.choice(promos)
-        self.log.info(
-            f"🎮 <y>Claiming Playground <g>{random_promo['title']['en']}</g>...</y>"
-        )
-
-        self.claim_promo(random_promo)
+            promo = random.choice(promos)
+            self.claim_promo(promo)
+        except Exception as e:
+            self.log.error(f"🔴 <red>Error claiming random Playground: {e}</red>")
 
     def clean_promos(self, promos):
+        states = promos["states"]
         promos = promos["promos"]
         final_promos = []
         for promo in promos:
             promo_name = promo["title"]["en"]
             if promo["promoId"] not in PromoGames:
-                self.log.info(f"🟡 <y>Unsupporting promo <g>{promo_name}</g>...</y>")
+                self.log.info(
+                    f"🟡 <y>Unsupporting promo <g>{promo_name}</g> game...</y>"
+                )
                 continue
 
-            # if promo finished log it and not add it to final_promos
+            receiveKeysToday = 0
+            for state in states:
+                if state["promoId"] == promo["promoId"] and "receiveKeysToday" in state:
+                    receiveKeysToday = state["receiveKeysToday"]
+                    break
+
+            if int(receiveKeysToday) >= int(promo["keysPerDay"]):
+                self.log.info(f"✅ <g>Max keys reached for <c>{promo_name}</c>...</g>")
+                continue
 
             final_promos.append(promo)
 
         return final_promos
 
     def claim_promo(self, promo):
-        self.log.info(f"🔄 <y>Claiming Playground <g>{promo['title']['en']}</g>...</y>")
-        promo_key = self.generate_promo_key(promo["promoId"])
-        if promo_key is None:
-            return
+        try:
+            self.log.info(
+                f"🔄 <y>Claiming Playground <g>{promo['title']['en']}</g>...</y>"
+            )
+            promo_key = self.generate_promo_key(promo["promoId"])
+            if promo_key is None:
+                return False
 
-        self.apply_promo(promo_key)
-        self.log.info(f"✅ <g>Claimed Playground <y>{promo['title']['en']}</y>!</g>")
+            resp = self.apply_promo(promo_key)
+            if not resp:
+                return False
+
+            self.log.info(
+                f"✅ <g>Claimed Playground <y>{promo['title']['en']}</y>!</g>"
+            )
+            return True
+        except Exception as e:
+            self.log.error(f"🔴 <red>Error claiming Playground: {e}</red>")
+            return False
 
     def apply_promo(self, promoCode):
         self.log.info(f"🎲 <y>Applying promo code <g>{promoCode}</g>...</y>")
@@ -72,9 +94,10 @@ class Playground:
             self.log.error(
                 f"🔴 <red>Failed to apply promo code <y>{promoCode}</y>!</red>"
             )
-            return
+            return False
 
         self.log.info(f"✅ <g>Applied promo code <y>{promoCode}</y>!</g>")
+        return True
 
     def generate_promo_key(self, promo_id):
         try:
