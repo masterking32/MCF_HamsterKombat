@@ -38,6 +38,7 @@ python bot.py
 - `accounts.json`: This file will be created by the MasterCryptoFarmBot after the user sets the accounts for the module in the control panel (Not Pyrogram accounts, Web Query Accounts). This file will be used by the module to read the accounts and apply them.
 - `bot.log`: This file will be created to save the logs of the module and display them in the control panel.
 - `FarmBot/FarmBot.py`: This file is the main file of the module. You can create your own classes and functions in this file or import other files to use them in the module.
+- `.disabled_module_accounts`: If you want to disable the module accounts feature, create this file in the module directory. The MasterCryptoFarmBot will not generate the `accounts.json` file if this file is present.
 
 ## 👟 Start Development
 
