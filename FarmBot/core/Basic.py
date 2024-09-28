@@ -69,7 +69,7 @@ class Basic:
         return response
 
     def get_version_config(self, version):
-        self.log.info(f"🔄 <y>Getting config <c>{version}</c> ...</y>")
+        self.log.info(f"🔄 <y>Getting config version: <c>{version}</c> ...</y>")
 
         response = self.http.get(
             url=f"interlude/config/{version}",

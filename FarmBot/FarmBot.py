@@ -16,6 +16,7 @@ from .core.HttpRequest import HttpRequest
 from .core.Auth import Auth
 from .core.Basic import Basic
 from .core.Cards import Cards
+from .core.Tasks import Tasks
 
 
 class FarmBot:
@@ -123,6 +124,15 @@ class FarmBot:
             cards = Cards(self.log, self.http)
             if getConfig("FarmBot", "auto_upgrade"):
                 cards.start_upgrades(balanceDiamonds)
+
+            tasks = Tasks(
+                self.log,
+                self.http,
+                v_config_data["config"]["tasks"],
+                list_tasks["tasks"],
+            )
+            if getConfig("FarmBot", "auto_tasks"):
+                tasks.start_tasks()
 
         except Exception as e:
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
