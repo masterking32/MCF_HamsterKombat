@@ -39,7 +39,10 @@ class HttpRequest:
         retries=3,
     ):
         try:
-            default_headers = self._get_default_headers()  if "api.gamepromo.io" not in url else {}
+            url = self._fix_url(url)
+            default_headers = (
+                self._get_default_headers() if "hamsterkombatgame.io" not in url else {}
+            )
 
             if headers is None:
                 headers = {}
@@ -101,7 +104,10 @@ class HttpRequest:
         retries=3,
     ):
         try:
-            default_headers = self._get_default_headers() if "api.gamepromo.io" not in url else {}
+            url = self._fix_url(url)
+            default_headers = (
+                self._get_default_headers() if "hamsterkombatgame.io" not in url else {}
+            )
 
             if headers is None:
                 headers = {}
@@ -161,17 +167,22 @@ class HttpRequest:
 
     def options(self, url, method, headers=None, valid_response_code=204, retries=3):
         try:
-            default_headers = self._get_get_option_headers(headers, method)  if "api.gamepromo.io" not in url else {}
+            url = self._fix_url(url)
+            default_headers = (
+                self._get_get_option_headers(headers, method)
+                if "hamsterkombatgame.io" in url
+                else {}
+            )
 
-            if "api.gamepromo.io" in url:
-                if headers is None:
-                    headers = {}
+            if headers is None:
+                headers = {}
 
-                if headers:
-                    default_headers.update(headers)
+            if headers:
+                for key, value in headers.items():
+                    default_headers[key] = value
 
             response = requests.options(
-                self._fix_url(url),
+                url=url,
                 headers=default_headers,
                 proxies=self._get_proxy(),
             )
