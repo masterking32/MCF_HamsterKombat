@@ -97,8 +97,9 @@ class Cards:
             if card.get("cooldownSeconds", 0) > 0:
                 continue
 
-            if card.get("level", -1) >= card.get("maxLevel", 0):
-                continue
+            if card.get("maxLevel") is not None:
+                if card.get("level", 0) >= card.get("maxLevel"):
+                    continue
 
             new_cards.append(card)
 
