@@ -4,6 +4,9 @@
 # Telegram: https://t.me/MasterCryptoFarmBot
 
 
+import json
+
+
 class Basic:
     def __init__(self, log, HttpRequest):
         self.log = log
@@ -117,11 +120,16 @@ class Basic:
 
         return response
 
-    def get_list(self):
+    def get_list(self, ip_data):
         self.log.info(f"🔄 <y>Getting list ...</y>")
 
         response = self.http.post(
             url="interlude/withdraw/list",
+            payload=json.dumps(
+                {
+                    "ipInfo": ip_data,
+                }
+            ),
         )
 
         if response is None:

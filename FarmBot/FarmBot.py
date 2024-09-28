@@ -108,7 +108,7 @@ class FarmBot:
             if list_tasks is None:
                 return
 
-            listing = basic.get_list()
+            listing = basic.get_list(ip)
             if listing is None:
                 return
 
