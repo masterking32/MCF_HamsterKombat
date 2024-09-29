@@ -77,12 +77,7 @@ class FarmBot:
             totalDiamonds = sync["totalDiamonds"]
             balanceDiamonds = sync["balanceDiamonds"]
             earnPassivePerHour = sync["earnPassivePerHour"]
-            upgrades = sync["upgrades"]
             tasks = sync["tasks"]
-            referralsCount = sync["referralsCount"]
-            skin = sync["skin"]
-            achievements = sync["achievements"]
-            promos = sync["promos"]
 
             totalDiamonds_short = "{:.2f}".format(totalDiamonds)
             balanceDiamonds_short = "{:.2f}".format(balanceDiamonds)
