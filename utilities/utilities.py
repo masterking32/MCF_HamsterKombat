@@ -52,3 +52,18 @@ def kill_process():
     except Exception as e:
         pass
     exit(0)
+
+
+def clean_logs():
+    try:
+        log_file = os.path.join(MODULE_DIR, "bot.log")
+        if not os.path.exists(log_file):
+            return
+
+        log_recent_file = os.path.join(MODULE_DIR, "bot_log_recent.log")
+        if os.path.exists(log_recent_file):
+            os.remove(log_recent_file)
+
+        os.rename(log_file, log_recent_file)
+    except Exception as e:
+        pass
