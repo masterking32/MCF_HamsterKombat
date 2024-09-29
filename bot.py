@@ -3,8 +3,8 @@
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
 
+import importlib
 import random
-import signal
 import sys
 import os
 import json
@@ -31,7 +31,16 @@ sys.path.append(str(MASTER_CRYPTO_FARM_BOT_DIR))
 try:
     import utils.logColors as lc
     from utils.tgAccount import tgAccount
-    import config as cfg
+
+    config_path = os.path.join(MASTER_CRYPTO_FARM_BOT_DIR, "config.py")
+    if not os.path.exists(config_path):
+        print(CONFIG_ERROR_MSG)
+        exit(1)
+
+    spec = importlib.util.spec_from_file_location("config", config_path)
+    cfg = importlib.util.module_from_spec(spec)
+    sys.modules["config"] = cfg
+    spec.loader.exec_module(cfg)
 except Exception as e:
     print(CONFIG_ERROR_MSG)
     exit(1)
