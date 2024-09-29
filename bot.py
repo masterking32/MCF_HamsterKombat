@@ -147,10 +147,16 @@ async def handle_pyrogram_accounts(accounts, bot_globals, log):
 
         disabled_sessions = load_json_file(MODULE_DISABLED_SESSIONS_FILE, [])
         for account in accounts:
-            if account["session_name"] in disabled_sessions:
-                log.info(f"<y>❌ Account {account['session_name']} is disabled!</y>")
+            try:
+                if account["session_name"] in disabled_sessions:
+                    log.info(
+                        f"<y>❌ Account {account['session_name']} is disabled!</y>"
+                    )
+                    continue
+                await process_pg_account(account, bot_globals, log)
+            except Exception as e:
+                log.error(f"<r>❌ Error processing Pyrogram account: {e}</r>")
                 continue
-            await process_pg_account(account, bot_globals, log)
 
         return True
     except Exception as e:
@@ -165,36 +171,40 @@ async def handle_module_accounts(accounts, bot_globals, log):
         )
         tg_tmp = tgAccount()
         for account in accounts:
-            proxy = account.get("proxy")
-            account_name = account.get("session_name")
-            web_app_data = account.get("web_app_data")
+            try:
+                proxy = account.get("proxy")
+                account_name = account.get("session_name")
+                web_app_data = account.get("web_app_data")
 
-            user_agent = account.get("user_agent")
-            if account.get("disabled"):
-                log.info(f"<y>❌ Account {account_name} is disabled!</y>")
-                continue
+                user_agent = account.get("user_agent")
+                if account.get("disabled"):
+                    log.info(f"<y>❌ Account {account_name} is disabled!</y>")
+                    continue
 
-            if not web_app_data:
-                log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
-                continue
+                if not web_app_data:
+                    log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
+                    continue
 
-            web_app_query = tg_tmp.getTGWebQuery(web_app_data)
-            if not web_app_query:
-                log.error(
-                    f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
+                web_app_query = tg_tmp.getTGWebQuery(web_app_data)
+                if not web_app_query:
+                    log.error(
+                        f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
+                    )
+                    continue
+
+                fb = FarmBot(
+                    log,
+                    bot_globals,
+                    account_name,
+                    web_app_data,
+                    proxy,
+                    user_agent,
+                    False,
                 )
+                await fb.run()
+            except Exception as e:
+                log.error(f"<r>❌ Error processing module account: {e}</r>")
                 continue
-
-            fb = FarmBot(
-                log,
-                bot_globals,
-                account_name,
-                web_app_data,
-                proxy,
-                user_agent,
-                False,
-            )
-            await fb.run()
 
         return True
     except Exception as e:
