@@ -3,6 +3,7 @@
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
 
+import time
 import requests
 
 
@@ -77,6 +78,7 @@ class HttpRequest:
         except Exception as e:
             if retries > 0:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
+                time.sleep(0.5)
                 return self.get(
                     url,
                     headers,
@@ -150,6 +152,7 @@ class HttpRequest:
         except Exception as e:
             if retries > 0:
                 self.log.info(f"🟡 <y> Unable to send request, retrying...</y>")
+                time.sleep(0.5)
                 return self.post(
                     url,
                     payload,
@@ -197,6 +200,7 @@ class HttpRequest:
         except Exception as e:
             if retries > 0:
                 self.log.info(f"🟡 <y> Unable to send option request, retrying...</y>")
+                time.sleep(0.5)
                 return self.options(
                     url, method, headers, valid_response_code, retries - 1
                 )
