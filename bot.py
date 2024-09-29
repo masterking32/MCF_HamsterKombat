@@ -196,7 +196,7 @@ async def handle_module_accounts(accounts, bot_globals, log):
                     log,
                     bot_globals,
                     account_name,
-                    web_app_data,
+                    web_app_query,
                     proxy,
                     user_agent,
                     False,
