@@ -229,7 +229,7 @@ PromoGames = {
         "eventOrigin": "undefined",
         "eventType": None,
         "delay": 35,
-        "retry_delay": 60,
+        "retry_delay": 300,
     },
     "d02fc404-8985-4305-87d8-32bd4e66bb16": {
         "newApi": True,
