@@ -17,7 +17,7 @@ from .core.Auth import Auth
 from .core.Basic import Basic
 from .core.Cards import Cards
 from .core.Tasks import Tasks
-from .core.Playground import Playground
+from .core.PlaygroundRequests import PlaygroundRequests
 
 
 class FarmBot:
@@ -153,7 +153,7 @@ class FarmBot:
                     "<y>🔔 If you have more than 5 accounts, make sure to use proxies for your accounts.</y>"
                 )
 
-            playground = Playground(self.log, self.http)
+            playground = PlaygroundRequests(self.log, self.http, self.bot_globals)
             playground.claim_random()
             self.log.info(
                 f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"

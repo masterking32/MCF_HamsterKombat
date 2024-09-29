@@ -10,9 +10,12 @@ import os
 import json
 import asyncio
 from pathlib import Path
+import threading
+import time
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
+from utilities.Playground import Playground as Playground
 
 # Constants
 CHECK_INTERVAL = utilities.getConfig("check_interval", 3600)
@@ -231,6 +234,10 @@ async def main():
 
     bot_globals["telegram_api_id"] = cfg.config["telegram_api"]["api_id"]
     bot_globals["telegram_api_hash"] = cfg.config["telegram_api"]["api_hash"]
+    bot_globals["Playground"] = Playground
+    if utilities.getConfig("auto_playground", True):
+        bot_globals["Playground"] = Playground(log)
+        threading.Thread(target=bot_globals["Playground"].start).start()
 
     while True:
         try:
