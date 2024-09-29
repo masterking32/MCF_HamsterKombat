@@ -165,7 +165,7 @@ PromoGames = {
         },
         "clientOrigin": "android",
         "clientIdType": "ts-19digits",
-        "clientVersion": "1.2.6",
+        "clientVersion": None,
         "eventIdType": "StartLevel",
         "eventOrigin": "undefined",
         "eventType": None,
@@ -228,7 +228,7 @@ PromoGames = {
         "eventIdType": "uuid",
         "eventOrigin": "undefined",
         "eventType": None,
-        "delay": 35,
+        "delay": 180,
         "retry_delay": 300,
     },
     "d02fc404-8985-4305-87d8-32bd4e66bb16": {
@@ -288,8 +288,8 @@ PromoGames = {
         "eventIdType": "uuid",
         "eventOrigin": "undefined",
         "eventType": "test",
-        "delay": 35,
-        "retry_delay": 60,
+        "delay": 60,
+        "retry_delay": 120,
     },
     "daab8f83-8ea2-4ad0-8dd5-d33363129640": {
         "newApi": True,
