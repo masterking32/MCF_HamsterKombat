@@ -5,6 +5,7 @@
 
 import json
 from utilities.hk import DetectOS, GenerateHKFingerprint
+from utils.utils import hide_text
 
 
 class Auth:
@@ -36,7 +37,7 @@ class Auth:
                 return None
 
             self.log.info(
-                f"✅ <g>Successfully logged in to HamsterKombat bot, UserID: </g><c>{login_data['authUserId']}</c>"
+                f"✅ <g>Successfully logged in to HamsterKombat bot, UserID: </g><c>{hide_text(login_data['authUserId'], 2)}</c>"
             )
 
             return login_data
@@ -57,7 +58,7 @@ class Auth:
 
         date = response["accountInfo"]["at"].split("T")[0].replace("-", "/")
         self.log.info(
-            f"🗒️ <g>Account ID: <c>{response['accountInfo']['id']}</c>, Join Date: <c>{date}</c></g>"
+            f"🗒️ <g>Account ID: <c>{hide_text(response['accountInfo']['id'], 2)}</c>, Join Date: <c>{date}</c></g>"
         )
 
         if headers is None:

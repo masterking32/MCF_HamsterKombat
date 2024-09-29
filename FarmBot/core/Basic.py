@@ -6,6 +6,8 @@
 
 import json
 import utils.utils as utils
+from utils.utils import hide_text
+
 
 class Basic:
     def __init__(self, log, HttpRequest):
@@ -69,7 +71,9 @@ class Basic:
         return response
 
     def get_version_config(self, version):
-        self.log.info(f"🔄 <y>Getting config version: <c>{version}</c> ...</y>")
+        self.log.info(
+            f"🔄 <y>Getting config version: <c>{hide_text(version,4)}</c> ...</y>"
+        )
 
         response = self.http.get(
             url=f"interlude/config/{version}",
