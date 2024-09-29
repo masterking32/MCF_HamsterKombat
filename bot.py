@@ -17,6 +17,7 @@ from FarmBot.FarmBot import FarmBot
 # Constants
 CHECK_INTERVAL = utilities.getConfig("check_interval", 3600)
 MASTER_CRYPTO_FARM_BOT_DIR = Path(__file__).resolve().parents[2]
+MODULE_DIR = Path(__file__).resolve().parent
 ACCOUNTS_FILE = MASTER_CRYPTO_FARM_BOT_DIR / "telegram_accounts/accounts.json"
 CONFIG_ERROR_MSG = (
     "\033[31mThis module is designed for MasterCryptoFarmBot.\033[0m\n"
@@ -122,11 +123,14 @@ async def process_pg_account(account, bot_globals, log):
 
 
 def get_disabled_sessions():
-    if not os.path.exists("disabled_sessions.json"):
+    disabled_sessions_path = os.path.join(
+        os.path.dirname(MODULE_DIR, "disabled_sessions.json")
+    )
+    if not os.path.exists(disabled_sessions_path):
         return []
 
     try:
-        with open("disabled_sessions.json", "r") as f:
+        with open(disabled_sessions_path, "r") as f:
             return json.load(f)
     except Exception as e:
         pass
@@ -166,6 +170,9 @@ async def main():
     bot_globals["telegram_api_id"] = cfg.config["telegram_api"]["api_id"]
     bot_globals["telegram_api_hash"] = cfg.config["telegram_api"]["api_hash"]
 
+    module_accounts_json_path = os.path.join(
+        os.path.dirname(MODULE_DIR, "accounts.json")
+    )
     while True:
         try:
             log.info("<g>🖥️ Start processing Pyrogram accounts ...</g>")
@@ -178,12 +185,12 @@ async def main():
                     continue
                 await process_pg_account(account, bot_globals, log)
 
-            if not Path("accounts.json").exists():
+            if not Path(module_accounts_json_path).exists():
                 await check_cd(log)
                 continue
 
             log.info("<g>👤 Checking for module accounts ...</g>")
-            with open("accounts.json", "r") as f:
+            with open(module_accounts_json_path, "r") as f:
                 json_accounts = json.load(f)
 
             if not json_accounts:
