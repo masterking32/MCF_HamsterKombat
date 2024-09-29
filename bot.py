@@ -123,9 +123,7 @@ async def process_pg_account(account, bot_globals, log):
 
 
 def get_disabled_sessions():
-    disabled_sessions_path = os.path.join(
-        os.path.dirname(MODULE_DIR, "disabled_sessions.json")
-    )
+    disabled_sessions_path = os.path.join(MODULE_DIR, "disabled_sessions.json")
     if not os.path.exists(disabled_sessions_path):
         return []
 
@@ -170,9 +168,7 @@ async def main():
     bot_globals["telegram_api_id"] = cfg.config["telegram_api"]["api_id"]
     bot_globals["telegram_api_hash"] = cfg.config["telegram_api"]["api_hash"]
 
-    module_accounts_json_path = os.path.join(
-        os.path.dirname(MODULE_DIR, "accounts.json")
-    )
+    module_accounts_json_path = os.path.join(MODULE_DIR, "accounts.json")
     while True:
         try:
             log.info("<g>🖥️ Start processing Pyrogram accounts ...</g>")
