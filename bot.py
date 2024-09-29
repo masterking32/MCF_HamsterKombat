@@ -18,7 +18,13 @@ from FarmBot.FarmBot import FarmBot
 CHECK_INTERVAL = utilities.getConfig("check_interval", 3600)
 MASTER_CRYPTO_FARM_BOT_DIR = Path(__file__).resolve().parents[2]
 MODULE_DIR = Path(__file__).resolve().parent
-ACCOUNTS_FILE = MASTER_CRYPTO_FARM_BOT_DIR / "telegram_accounts/accounts.json"
+
+PYROGRAM_ACCOUNTS_FILE = os.path.join(
+    MASTER_CRYPTO_FARM_BOT_DIR, "telegram_accounts/accounts.json"
+)
+MODULE_ACCOUNTS_FILE = os.path.join(MODULE_DIR, "accounts.json")
+MODULE_DISABLED_SESSIONS_FILE = os.path.join(MODULE_DIR, "disabled_sessions.json")
+
 CONFIG_ERROR_MSG = (
     "\033[31mThis module is designed for MasterCryptoFarmBot.\033[0m\n"
     "\033[31mYou cannot run this module as a standalone application.\033[0m\n"
@@ -62,28 +68,21 @@ APP_URL = "https://hamsterkombatgame.io/"
 # End of variables to edit
 
 
-async def load_accounts(log):
+def load_json_file(file_path, default=None):
     try:
-        if not ACCOUNTS_FILE.exists():
-            log.info("<y>└─ 🟠 No Pyrogram account found.</y>")
-            return []
+        if not os.path.exists(file_path):
+            return default
 
-        with open(ACCOUNTS_FILE, "r") as f:
-            accounts = json.load(f)
+        with open(file_path, "r") as f:
+            json_result = json.load(f)
+            if not json_result or len(json_result) == 0:
+                return default
+            return json_result
 
-        if not accounts:
-            log.info("<y>└─ 🟠 No Pyrogram account found.</y>")
-            return []
-
-        log.info(
-            "<g>└─ 👤</g><c>"
-            + str(len(accounts))
-            + "</c><g> Pyrogram account(s) found!</g>"
-        )
-        return accounts
     except Exception as e:
-        log.error(f"<r>❌ Error loading Pyrogram accounts: {e}</r>")
-        return []
+        pass
+
+    return default
 
 
 async def process_pg_account(account, bot_globals, log):
@@ -131,18 +130,76 @@ async def process_pg_account(account, bot_globals, log):
         return False
 
 
-def get_disabled_sessions():
-    disabled_sessions_path = os.path.join(MODULE_DIR, "disabled_sessions.json")
-    if not os.path.exists(disabled_sessions_path):
-        return []
-
+async def handle_pyrogram_accounts(accounts, bot_globals, log):
     try:
-        with open(disabled_sessions_path, "r") as f:
-            return json.load(f)
-    except Exception as e:
-        pass
+        log.info(
+            f"<g>🖥️ Start processing <c>{len(accounts)}</c> Pyrogram accounts ...</g>"
+        )
 
-    return []
+        if (
+            bot_globals["telegram_api_id"] == 1234
+            or bot_globals["telegram_api_hash"] == ""
+        ):
+            log.error(
+                "<r>❌ Telegram API ID and API Hash are not set in the config file!</r>"
+            )
+            return False
+
+        disabled_sessions = load_json_file(MODULE_DISABLED_SESSIONS_FILE, [])
+        for account in accounts:
+            if account["session_name"] in disabled_sessions:
+                log.info(f"<y>❌ Account {account['session_name']} is disabled!</y>")
+                continue
+            await process_pg_account(account, bot_globals, log)
+
+        return True
+    except Exception as e:
+        log.error(f"<r>❌ Error processing Pyrogram accounts: {e}</r>")
+        return False
+
+
+async def handle_module_accounts(accounts, bot_globals, log):
+    try:
+        log.info(
+            f"<g>🖥️ Start processing <c>{len(accounts)}</c> module accounts ...</g>"
+        )
+        tg_tmp = tgAccount()
+        for account in accounts:
+            proxy = account.get("proxy")
+            account_name = account.get("session_name")
+            web_app_data = account.get("web_app_data")
+
+            user_agent = account.get("user_agent")
+            if account.get("disabled"):
+                log.info(f"<y>❌ Account {account_name} is disabled!</y>")
+                continue
+
+            if not web_app_data:
+                log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
+                continue
+
+            web_app_query = tg_tmp.getTGWebQuery(web_app_data)
+            if not web_app_query:
+                log.error(
+                    f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
+                )
+                continue
+
+            fb = FarmBot(
+                log,
+                bot_globals,
+                account_name,
+                web_app_data,
+                proxy,
+                user_agent,
+                False,
+            )
+            await fb.run()
+
+        return True
+    except Exception as e:
+        log.error(f"<r>❌ Error processing module accounts: {e}</r>")
+        return False
 
 
 async def main():
@@ -161,90 +218,25 @@ async def main():
         log.info(f"<r>🚫 {module_name} module is disabled!</r>")
         exit(0)
 
-    log.info("<g>👤 Checking for Pyrogram accounts ...</g>")
-    accounts = await load_accounts(log)
-
-    if (
-        accounts
-        and cfg.config["telegram_api"]["api_id"] == 1234
-        or not cfg.config["telegram_api"]["api_hash"]
-    ):
-        log.error(
-            f"<r>🔴 Please add your Telegram API ID and API Hash to the config.py file!</r>"
-        )
-        exit(1)
-
     bot_globals["telegram_api_id"] = cfg.config["telegram_api"]["api_id"]
     bot_globals["telegram_api_hash"] = cfg.config["telegram_api"]["api_hash"]
 
-    module_accounts_json_path = os.path.join(MODULE_DIR, "accounts.json")
     while True:
         try:
-            log.info("<g>🖥️ Start processing Pyrogram accounts ...</g>")
-            disabled_sessions = get_disabled_sessions()
-            accounts = await load_accounts(log)
-            for account in accounts:
-                if account["session_name"] in disabled_sessions:
-                    log.info(
-                        f"<y>❌ Account {account['session_name']} is disabled!</y>"
-                    )
-                    continue
-                await process_pg_account(account, bot_globals, log)
+            log.info("<g>🔍 Checking for accounts ...</g>")
+            pyrogram_accounts = load_json_file(PYROGRAM_ACCOUNTS_FILE, None)
+            if pyrogram_accounts is not None:
+                await handle_pyrogram_accounts(pyrogram_accounts, bot_globals, log)
+            else:
+                log.info("<y>🟠 No Pyrogram accounts found!</y>")
 
-            if not Path(module_accounts_json_path).exists():
+            module_accounts = load_json_file(MODULE_ACCOUNTS_FILE, None)
+            if module_accounts is None:
+                log.info("<y>🟠 No module accounts found!</y>")
                 await check_cd(log)
                 continue
 
-            log.info("<g>👤 Checking for module accounts ...</g>")
-            with open(module_accounts_json_path, "r") as f:
-                json_accounts = json.load(f)
-
-            if not json_accounts:
-                log.info("<y>└─ 🟠 No module accounts found!</y>")
-                await check_cd(log)
-                continue
-
-            log.info(
-                "<g>└─ 👤</g><c>"
-                + str(len(json_accounts))
-                + "</c><g> Module account(s) found!</g>"
-            )
-
-            log.info("<g>🖥️ Start processing module accounts ...</g>")
-
-            tg_tmp = tgAccount()
-            for account in json_accounts:
-                proxy = account.get("proxy")
-                account_name = account.get("session_name")
-                web_app_data = account.get("web_app_data")
-
-                user_agent = account.get("user_agent")
-                if account.get("disabled"):
-                    log.info(f"<y>❌ Account {account_name} is disabled!</y>")
-                    continue
-
-                if not web_app_data:
-                    log.error(f"<r>❌ Account {account_name} WebApp data is empty!</r>")
-                    continue
-
-                web_app_query = tg_tmp.getTGWebQuery(web_app_data)
-                if not web_app_query:
-                    log.error(
-                        f"<r>❌ Account {account_name} WebApp query is not valid!</r>"
-                    )
-                    continue
-
-                fb = FarmBot(
-                    log,
-                    bot_globals,
-                    account_name,
-                    web_app_data,
-                    proxy,
-                    user_agent,
-                    False,
-                )
-                await fb.run()
-
+            await handle_module_accounts(module_accounts, bot_globals, log)
             await check_cd(log)
         except Exception as e:
             log.error(f"<r>❌ Error processing Pyrogram accounts: {e}</r>")
