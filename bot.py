@@ -245,8 +245,12 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print(f"{lc.r}🛑 Bot Module interrupted by user ...{lc.rs}")
-        os.kill(os.getpid(), signal.SIGINT)
+        print(f"{lc.r}🛑 Bot Module interrupted by user ... {lc.rs}")
     except Exception as e:
-        print(f"{lc.r}🛑 Bot Module stopped with an error: {e} ...{lc.rs}")
-        os.kill(os.getpid(), signal.SIGINT)
+        print(f"{lc.r}🛑 Bot Module stopped with an error: {e} ... {lc.rs}")
+
+    try:
+        os._exit(0)
+    except Exception as e:
+        print(f"{lc.r}🛑 Error while stopping the bot: {e} ... {lc.rs}")
+        exit()
