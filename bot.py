@@ -173,6 +173,7 @@ async def main():
         try:
             log.info("<g>🖥️ Start processing Pyrogram accounts ...</g>")
             disabled_sessions = get_disabled_sessions()
+            accounts = await load_accounts(log)
             for account in accounts:
                 if account["session_name"] in disabled_sessions:
                     log.info(
