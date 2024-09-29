@@ -214,6 +214,7 @@ async def handle_module_accounts(accounts, bot_globals, log):
 
 
 async def main():
+    utilities.clean_logs()
     module_dir = Path(__file__).resolve().parent
     module_name = module_dir.name
     log = lc.getLogger(str(module_dir / "bot.log"), module_name)
