@@ -137,3 +137,33 @@ class Basic:
             return None
 
         return response
+
+    def get_referral_info(self):
+        self.log.info(f"🔄 <y>Getting referral info ...</y>")
+
+        response = self.http.post(
+            url="interlude/referrer-info",
+        )
+
+        if response is None:
+            self.log.error("🔴 <red>Failed to get referral info!</red>")
+            return None
+
+        return response
+
+    def set_select_exchange(self, exChangeId):
+        self.log.info(f"🔄 <y>Setting exchange ...</y>")
+        response = self.http.post(
+            url="interlude/select-exchange",
+            payload=json.dumps(
+                {
+                    "exchangeId": exChangeId,
+                }
+            ),
+        )
+
+        if response is None:
+            self.log.error("🔴 <red>Failed to set exchange!</red>")
+            return None
+
+        return response

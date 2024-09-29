@@ -79,6 +79,12 @@ class FarmBot:
             earnPassivePerHour = sync["earnPassivePerHour"]
             tasks = sync["tasks"]
 
+            if "exchangeId" not in sync or sync["exchangeId"] is None:
+                self.log.info("<y>👶 Looks account is new!</y>")
+                self.log.info(f"<g>🐹 Setting up hamster account</g>")
+                basic.get_referral_info()
+                basic.set_select_exchange("hamster")
+
             totalDiamonds_short = "{:.2f}".format(totalDiamonds)
             balanceDiamonds_short = "{:.2f}".format(balanceDiamonds)
             earnPassivePerHour_short = "{:.2f}".format(earnPassivePerHour)
