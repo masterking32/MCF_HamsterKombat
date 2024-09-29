@@ -57,6 +57,10 @@ class Cards:
         )
 
     def buy_card(self, card):
+        if card is None or "id" not in card:
+            self.log.error("❌ <red>Card not found!</red>")
+            return False
+
         cardId = card["id"]
         cardName = card["name"]
         cardPrice = card["price"]
@@ -65,7 +69,6 @@ class Cards:
         self.log.info(
             f"💳 <g>Start upgrading card <c>{cardName}</c> to level <c>{cardLevel}</c> for <c>{cardPrice}💎</c></g>"
         )
-
         response = self.http.post(
             url="interlude/buy-upgrade",
             payload=json.dumps(
