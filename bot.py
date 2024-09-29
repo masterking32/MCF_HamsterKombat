@@ -115,15 +115,16 @@ async def process_pg_account(account, bot_globals, log):
 
         log.info(f"<g>└─ ✅ Account {account['session_name']} is ready!</g>")
         fb = FarmBot(
-            log,
-            bot_globals,
-            account["session_name"],
-            web_app_query,
-            account["proxy"],
-            account["user_agent"],
-            True,
-            tg,
+            log=log,
+            bot_globals=bot_globals,
+            account_name=account["session_name"],
+            web_app_query=web_app_query,
+            proxy=account["proxy"],
+            user_agent=account["user_agent"],
+            isPyrogram=True,
+            tgAccount=tg,
         )
+
         await fb.run()
     except Exception as e:
         log.error(f"<r>❌ Error processing Pyrogram account: {e}</r>")
@@ -193,13 +194,13 @@ async def handle_module_accounts(accounts, bot_globals, log):
                     continue
 
                 fb = FarmBot(
-                    log,
-                    bot_globals,
-                    account_name,
-                    web_app_data,
-                    proxy,
-                    user_agent,
-                    False,
+                    log=log,
+                    bot_globals=bot_globals,
+                    account_name=account_name,
+                    web_app_query=web_app_query,
+                    proxy=proxy,
+                    user_agent=user_agent,
+                    isPyrogram=False,
                 )
                 await fb.run()
             except Exception as e:
