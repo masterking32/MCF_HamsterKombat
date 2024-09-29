@@ -5,6 +5,7 @@
 
 import datetime
 import json
+import random
 import time
 from .Basic import Basic
 from utilities.utilities import getConfig
@@ -44,6 +45,7 @@ class Cards:
                 )
                 break
 
+            time.sleep(5)
             buy_card = self.buy_card(best_card)
             if not buy_card:
                 self.log.error("❌ <red>Failed to buy card!</red>")
@@ -74,7 +76,8 @@ class Cards:
             payload=json.dumps(
                 {
                     "upgradeId": cardId,
-                    "timestamp": int(datetime.datetime.now().timestamp() * 1000),
+                    "timestamp": int(datetime.datetime.now().timestamp() * 1000)
+                    - random.randint(100, 1000),
                 }
             ),
         )
