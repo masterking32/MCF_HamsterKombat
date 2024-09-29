@@ -5,7 +5,7 @@
 
 
 import json
-
+import utils.utils as utils
 
 class Basic:
     def __init__(self, log, HttpRequest):
@@ -24,7 +24,7 @@ class Basic:
             return None
 
         self.log.info(
-            f"🌍 <g>IP: <y>{response['ip']}</y>, Country: <y>{response['country_code']}</y></g>"
+            f"🌍 <g>IP: <y>{utils.HideIP(response['ip'])}</y>, Country: <y>{response['country_code']}</y></g>"
         )
 
         return response
