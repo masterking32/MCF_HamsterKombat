@@ -54,9 +54,12 @@ class Cards:
             profit_per_hour = profit_per_hour + best_card["profitPerHourDelta"]
             time.sleep(5)
 
-        self.log.info(
-            f"💸 <g>Upgrade completed, spent amount: <c>{spent_amount}💎</c>, profit per hour: <c>{profit_per_hour}💎</c></g>"
-        )
+        if spent_amount == 0 and profit_per_hour == 0:
+            self.log.info(f"💸 <y>No upgrades available ...</y>")
+        else:
+            self.log.info(
+                f"💸 <g>Upgrade completed, spent amount: <c>{spent_amount}💎</c>, profit per hour: <c>{profit_per_hour}💎</c></g>"
+            )
 
     def buy_card(self, card):
         if card is None or "id" not in card:
