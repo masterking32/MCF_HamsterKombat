@@ -64,7 +64,7 @@ class Cards:
                     self.log.error(
                         f"❌ <red>Buying upgrades has been interrupted due to errors ({buy_errors}).</red>"
                     )
-                    return
+                    break
                 continue
             spent_amount = spent_amount + best_card["price"]
             profit_per_hour = profit_per_hour + best_card["profitPerHourDelta"]
