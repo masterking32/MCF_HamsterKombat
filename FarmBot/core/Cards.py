@@ -51,8 +51,8 @@ class Cards:
 
         self.log.info(
             f"💸 <g>Potential upgrades: <c>{len(potential_upgrades)}</c> "
-            f"with total price <c>{'{:.2f}'.format(potential_price)}💎</c> "
-            f"and profit <c>+{'{:.2f}'.format(potential_profit)}💎</c></g>"
+            f"with total price <c>{potential_price:.2f}💎</c> "
+            f"and profit <c>+{potential_profit:.2f}💎</c></g>"
         )
 
         buy_errors = 0
@@ -74,8 +74,8 @@ class Cards:
             self.log.info(f"💴 <y>No upgrades available ...</y>")
         else:
             self.log.info(
-                f"💸 <g>Upgrade completed, spent amount: <c>{'{:.2f}'.format(spent_amount)}💎</c>, "
-                f"profit per hour: <c>{'{:.2f}'.format(profit_per_hour)}💎</c></g>"
+                f"💸 <g>Upgrade completed, spent amount: <c>{spent_amount:.2f}💎</c>, "
+                f"profit per hour: <c>{profit_per_hour:.2f}💎</c></g>"
             )
 
     def buy_card(self, card):
@@ -89,7 +89,7 @@ class Cards:
         cardLevel = card["level"]
 
         self.log.info(
-            f"💳 <g>Start upgrading card <c>{cardName}</c> to level <c>{cardLevel}</c> for <c>{cardPrice}💎</c></g>"
+            f"💳 <g>Start upgrading card <c>{cardName}</c> to level <c>{cardLevel}</c> for <c>{cardPrice:.2f}💎</c></g>"
         )
         response = self.http.post(
             url="interlude/buy-upgrade",
@@ -107,7 +107,7 @@ class Cards:
             return False
 
         self.log.info(
-            f"💰 <g>Card <c>{card['name']}</c> was upgraded to level <c>{card['level']}</c> for <c>{card['price']}💎</c></g>"
+            f"💰 <g>Card <c>{card['name']}</c> was upgraded to level <c>{card['level']}</c> for <c>{card['price']:.2f}💎</c></g>"
         )
         return True
 
