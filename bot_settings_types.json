@@ -21,6 +21,15 @@
     "description": "Automatically upgrade your hamster cards."
   },
   {
+    "key": "upgrade_coefficient",
+    "name": "Upgrade Coefficient",
+    "type": "range",
+    "default_value": 200,
+    "description": "Upgrade coefficient, if [card price] / [card profit] > [Upgrade Coefficient] then do not buy this card.",
+    "min": 100,
+    "max": 10000
+  },
+  {
     "key": "check_interval",
     "name": "Check Interval",
     "type": "range",
