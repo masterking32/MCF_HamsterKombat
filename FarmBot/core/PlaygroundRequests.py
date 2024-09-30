@@ -9,7 +9,7 @@ import time
 import uuid
 import string
 from .Basic import Basic
-from .PromoGames import PromoGames
+from utilities.PromoGames import PromoGames
 
 
 class PlaygroundRequests:
