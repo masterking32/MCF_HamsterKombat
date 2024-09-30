@@ -21,44 +21,61 @@ class Cards:
         self.log.info("🔝 <y>Starting upgrade ...</y>")
         spent_amount = 0
         profit_per_hour = 0
-        while True:
-            basic = self.basic.get_upgrades_for_buy()
-            if basic is None or "upgradesForBuy" not in basic:
+        basic = self.basic.get_upgrades_for_buy()
+        if basic is None or "upgradesForBuy" not in basic:
+            return
+
+        cards = self.get_available_cards(basic["upgradesForBuy"])
+        if not cards or len(cards) == 0:
+            self.log.info(f"💸 <y>No upgrades available ...</y>")
+            return
+
+        self.sort_cards(cards)
+
+        potential_upgrades = []
+        potential_price = 0
+        potential_profit = 0
+        for upgrade in cards:
+            upgrade_cost = upgrade["price"]
+            upgrade_profit = upgrade["profitPerHourDelta"]
+            if potential_price + upgrade_cost <= balance:
+                potential_upgrades.append(upgrade)
+                potential_price += upgrade_cost
+                potential_profit += upgrade_profit
+            else:
                 break
 
-            cards = self.get_available_cards(basic["upgradesForBuy"])
-            if not cards or len(cards) == 0:
-                break
+        if not potential_upgrades or len(potential_upgrades) == 0:
+            self.log.info(f"💴 <y>No upgrades available ...</y>")
+            return
 
-            self.sort_cards(cards)
-            best_card = cards[0]
-            if best_card["price"] > balance:
-                self.log.info(
-                    f"💴 <g>Card <c>{best_card['name']}</c> is too expensive</g>"
-                )
-                break
+        self.log.info(
+            f"💸 <g>Potential upgrades: <c>{len(potential_upgrades)}</c> "
+            f"with total price <c>{'{:.2f}'.format(potential_price)}💎</c> "
+            f"and profit <c>+{'{:.2f}'.format(potential_profit)}💎</c></g>"
+        )
 
-            card_coefficient = self.get_card_coefficient(best_card)
-            if card_coefficient > getConfig("upgrade_coefficient", 200):
-                self.log.info(
-                    f"🪙 <g>Card <c>{best_card['name']}</c> exceeds the upgrade coefficient and is too expensive</g>"
-                )
-                break
-
+        buy_errors = 0
+        for best_card in potential_upgrades:
             time.sleep(5)
             buy_card = self.buy_card(best_card)
             if not buy_card:
-                self.log.error("❌ <red>Failed to buy card!</red>")
-                break
+                if buy_errors >= 3:
+                    self.log.error(
+                        f"❌ <red>Buying upgrades has been interrupted due to errors ({buy_errors}).</red>"
+                    )
+                    return
+                continue
             spent_amount = spent_amount + best_card["price"]
             profit_per_hour = profit_per_hour + best_card["profitPerHourDelta"]
             time.sleep(5)
 
         if spent_amount == 0 and profit_per_hour == 0:
-            self.log.info(f"💸 <y>No upgrades available ...</y>")
+            self.log.info(f"💴 <y>No upgrades available ...</y>")
         else:
             self.log.info(
-                f"💸 <g>Upgrade completed, spent amount: <c>{spent_amount}💎</c>, profit per hour: <c>{profit_per_hour}💎</c></g>"
+                f"💸 <g>Upgrade completed, spent amount: <c>{'{:.2f}'.format(spent_amount)}💎</c>, "
+                f"profit per hour: <c>{'{:.2f}'.format(profit_per_hour)}💎</c></g>"
             )
 
     def buy_card(self, card):
@@ -109,6 +126,13 @@ class Cards:
             if card.get("maxLevel") is not None:
                 if card.get("level", 0) >= card.get("maxLevel"):
                     continue
+
+            card_coefficient = self.get_card_coefficient(card)
+            if card_coefficient > getConfig("upgrade_coefficient", 200):
+                self.log.info(
+                    f"🪙 <y>Card <c>{card['name']}</c> exceeds the upgrade coefficient and is too expensive, you can increase the coefficient in module settings.</y>"
+                )
+                continue
 
             new_cards.append(card)
 
