@@ -136,13 +136,12 @@ class Cards:
 
             new_cards.append(card)
 
-        expensive_card_names = ", ".join(
-            [f"<c>{card['name']}</c>" for card in expensive_cards]
-        )
-        self.log.info(
-            f"🪙 <y>Cards {expensive_card_names} exceeds the upgrade coefficient ({coefficient_limit}).</y>"
-        )
-        self.log.info(f"🪙 <y>You can adjust the coefficient in module settings.</y>")
+        if expensive_cards and len(expensive_cards) > 0:
+            expensive_card_names = ", ".join([f"<c>{card['name']}</c>" for card in expensive_cards])
+            self.log.info(
+                f"🪙 <y>Cards {expensive_card_names} exceeds the upgrade coefficient ({coefficient_limit}).</y>"
+            )
+            self.log.info(f"🪙 <y>You can adjust the coefficient in module settings.</y>")
 
         return new_cards
 
