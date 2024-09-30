@@ -338,6 +338,9 @@ class Playground:
                     f"<m>[Playground]</m> 🔴 <red> {method} Request Error: {url} Response code: {response.status_code}</red>"
                 )
                 return None
+            if method == "OPTIONS":
+                return True
+
             return response.json()
         except Exception as e:
             if retries > 0:
