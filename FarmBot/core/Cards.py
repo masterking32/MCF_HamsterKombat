@@ -113,6 +113,7 @@ class Cards:
 
     def get_available_cards(self, cards):
         new_cards = []
+        expensive_cards = []
         for card in cards:
             if not card.get("isAvailable", True):
                 continue
@@ -127,14 +128,19 @@ class Cards:
                 if card.get("level", 0) >= card.get("maxLevel"):
                     continue
 
+            coefficient_limit = getConfig("upgrade_coefficient", 200)
             card_coefficient = self.get_card_coefficient(card)
-            if card_coefficient > getConfig("upgrade_coefficient", 200):
-                self.log.info(
-                    f"🪙 <y>Card <c>{card['name']}</c> exceeds the upgrade coefficient and is too expensive, you can increase the coefficient in module settings.</y>"
-                )
+            if card_coefficient > coefficient_limit:
+                expensive_cards.append(card)
                 continue
 
             new_cards.append(card)
+
+        expensive_card_names = ", ".join([f"<c>{card['name']}</c>" for card in expensive_cards])
+        self.log.info(
+            f"🪙 <y>Cards {expensive_card_names} exceeds the upgrade coefficient ({coefficient_limit}).</y>"
+        )
+        self.log.info(f"🪙 <y>You can adjust the coefficient in module settings.</y>")
 
         return new_cards
 
