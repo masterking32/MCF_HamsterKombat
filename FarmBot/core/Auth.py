@@ -5,7 +5,7 @@
 
 import json
 from utilities.hk import DetectOS, GenerateHKFingerprint
-from utils.utils import hide_text
+from mcf_utils.utils import hide_text
 
 
 class Auth:

@@ -5,8 +5,7 @@
 
 
 import json
-import utils.utils as utils
-from utils.utils import hide_text
+import mcf_utils.utils as utils
 
 
 class Basic:
@@ -72,7 +71,7 @@ class Basic:
 
     def get_version_config(self, version):
         self.log.info(
-            f"🔄 <y>Getting config version: <c>{hide_text(version,4)}</c> ...</y>"
+            f"🔄 <y>Getting config version: <c>{utils.hide_text(version,4)}</c> ...</y>"
         )
 
         response = self.http.get(

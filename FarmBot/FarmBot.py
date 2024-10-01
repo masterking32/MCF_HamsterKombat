@@ -6,7 +6,6 @@ import sys
 import os
 
 from utilities.utilities import getConfig
-
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
 )
@@ -18,7 +17,6 @@ from .core.Basic import Basic
 from .core.Cards import Cards
 from .core.Tasks import Tasks
 from .core.PlaygroundRequests import PlaygroundRequests
-
 
 class FarmBot:
     def __init__(
