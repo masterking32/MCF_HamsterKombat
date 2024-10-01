@@ -5,15 +5,10 @@
 import sys
 import os
 
-import utilities.utilities as utilities
-
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
 )
 sys.path.append(MasterCryptoFarmBot_Dir)
-
-
-import utils.logColors as lc
 
 
 class FarmBot:
