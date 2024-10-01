@@ -30,39 +30,35 @@ class Cards:
             self.log.info(f"💸 <y>No upgrades available ...</y>")
             return
 
-        self.sort_cards(cards)
-
-        potential_upgrades = []
-        potential_price = 0
-        potential_profit = 0
-        for upgrade in cards:
-            upgrade_cost = upgrade["price"]
-            upgrade_profit = upgrade["profitPerHourDelta"]
-            if potential_price + upgrade_cost <= balance:
-                potential_upgrades.append(upgrade)
-                potential_price += upgrade_cost
-                potential_profit += upgrade_profit
-            else:
-                break
-
-        if not potential_upgrades or len(potential_upgrades) == 0:
+        self.filter_by_balance(cards, balance)
+        if not cards or len(cards) == 0:
             self.log.info(f"💴 <y>No upgrades available ...</y>")
             return
 
+        self.filter_by_coefficient(cards)
+        if not cards or len(cards) == 0:
+            self.log.info(f"💴 <y>No upgrades available ...</y>")
+            return
+        
+        self.sort_cards(cards)
+        
+        cards_price = sum(card['price'] for card in cards)
+        cards_profit = sum(card['profitPerHourDelta'] for card in cards)
+
         self.log.info(
-            f"💸 <g>Potential upgrades: <c>{len(potential_upgrades)}</c> "
-            f"with total price <c>{potential_price:.2f}💎</c> "
-            f"and profit <c>+{potential_profit:.2f}💎</c></g>"
+            f"💸 <g>Available cards: <c>{len(cards)}</c> "
+            f"with total price <c>{cards_price:.2f}💎</c> "
+            f"and profit <c>+{cards_profit:.2f}💎</c></g>"
         )
 
         buy_errors = 0
-        for best_card in potential_upgrades:
+        for best_card in cards:
             time.sleep(5)
             buy_card = self.buy_card(best_card)
             if not buy_card:
                 if buy_errors >= 3:
                     self.log.error(
-                        f"❌ <red>Buying upgrades has been interrupted due to errors ({buy_errors}).</red>"
+                        f"❌ <red>Buying cards has been interrupted due to errors ({buy_errors}).</red>"
                     )
                     break
                 continue
@@ -76,6 +72,39 @@ class Cards:
             self.log.info(
                 f"💸 <g>Upgrade completed, spent amount: <c>{spent_amount:.2f}💎</c>, "
                 f"profit per hour: <c>{profit_per_hour:.2f}💎</c></g>"
+            )
+
+    def filter_by_balance(self, cards, balance):
+        potential_price = 0
+        potential_profit = 0
+        for i in reversed(range(len(cards))):
+            upgrade_cost = cards[i]["price"]
+            upgrade_profit = cards[i]["profitPerHourDelta"]
+            if potential_price + upgrade_cost <= balance:
+                potential_price += upgrade_cost
+                potential_profit += upgrade_profit
+            else:
+                del cards[i]
+
+    def filter_by_coefficient(self, cards):
+        coefficient_limit = getConfig("upgrade_coefficient", 200)
+        expensive_cards = []
+
+        for i in reversed(range(len(cards))):
+            card_coefficient = self.get_card_coefficient(cards[i])
+            if card_coefficient > coefficient_limit:
+                expensive_cards.append(cards[i])
+                del cards[i]
+
+        if expensive_cards:
+            expensive_card_names = ", ".join(
+                [f"<c>{card['name']}</c>" for card in expensive_cards]
+            )
+            self.log.info(
+                f"🪙 <y>Cards {expensive_card_names} exceed the upgrade coefficient ({coefficient_limit}).</y>"
+            )
+            self.log.info(
+                f"🪙 <y>You can adjust the coefficient in module settings.</y>"
             )
 
     def buy_card(self, card):
@@ -113,7 +142,6 @@ class Cards:
 
     def get_available_cards(self, cards):
         new_cards = []
-        expensive_cards = []
         for card in cards:
             if not card.get("isAvailable", True):
                 continue
@@ -128,24 +156,7 @@ class Cards:
                 if card.get("level", 0) >= card.get("maxLevel"):
                     continue
 
-            coefficient_limit = getConfig("upgrade_coefficient", 200)
-            card_coefficient = self.get_card_coefficient(card)
-            if card_coefficient > coefficient_limit:
-                expensive_cards.append(card)
-                continue
-
             new_cards.append(card)
-
-        if expensive_cards and len(expensive_cards) > 0:
-            expensive_card_names = ", ".join(
-                [f"<c>{card['name']}</c>" for card in expensive_cards]
-            )
-            self.log.info(
-                f"🪙 <y>Cards {expensive_card_names} exceeds the upgrade coefficient ({coefficient_limit}).</y>"
-            )
-            self.log.info(
-                f"🪙 <y>You can adjust the coefficient in module settings.</y>"
-            )
 
         return new_cards
 
