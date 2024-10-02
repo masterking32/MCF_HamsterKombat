@@ -11,7 +11,7 @@ import json
 import asyncio
 from pathlib import Path
 import threading
-import time
+
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
@@ -71,7 +71,7 @@ async def check_cd(log):
 
 # Edit the following variables
 BOT_ID = "hamster_kombat_bot"
-REFERRAL_TOKEN = "kentId95736407"
+REFERRAL_TOKEN = utilities.getConfig("referral_token", "kentId95736407")
 SHORT_APP_NAME = None
 APP_URL = "https://hamsterkombatgame.io/"
 # End of variables to edit
@@ -103,13 +103,21 @@ async def process_pg_account(account, bot_globals, log):
         if account.get("proxy") == "":
             account["proxy"] = None
 
+        referral_token = REFERRAL_TOKEN
+        if (
+            REFERRAL_TOKEN == ""
+            or REFERRAL_TOKEN is None
+            or "kentId" not in REFERRAL_TOKEN
+        ):
+            referral_token = "kentId95736407"
+
         tg = tgAccount(
             bot_globals,
             log,
             account["session_name"],
             account["proxy"],
             BOT_ID,
-            REFERRAL_TOKEN,
+            referral_token,
             SHORT_APP_NAME,
             APP_URL,
         )

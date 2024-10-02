@@ -37,5 +37,14 @@
     "description": "Interval in seconds to check accounts.",
     "min": 300,
     "max": 3600
+  },
+  {
+    "key": "referral_token",
+    "name": "Referral Token",
+    "type": "text",
+    "default_value": "kentId95736407",
+    "placeholder": "kentId95736407",
+    "description": "Referral token to use for new accounts.",
+    "required": false
   }
 ]
