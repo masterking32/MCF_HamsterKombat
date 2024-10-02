@@ -2,10 +2,13 @@
 # Date: 2024
 # Github: https://github.com/masterking32
 # Telegram: https://t.me/MasterCryptoFarmBot
+import random
 import sys
 import os
+import time
 
 from utilities.utilities import getConfig
+
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
 )
@@ -17,6 +20,7 @@ from .core.Basic import Basic
 from .core.Cards import Cards
 from .core.Tasks import Tasks
 from .core.PlaygroundRequests import PlaygroundRequests
+
 
 class FarmBot:
     def __init__(
@@ -156,6 +160,14 @@ class FarmBot:
             self.log.info(
                 f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
             )
+
+            return True
         except Exception as e:
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
             return False
+        finally:
+            random_sleep = random.randint(30, 120)
+            self.log.info(
+                f"<g>⌛ Farming for <c>{self.account_name}</c> completed. Waiting for <c>{random_sleep}</c> seconds before running the next account...</g>"
+            )
+            time.sleep(random_sleep)
