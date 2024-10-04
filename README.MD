@@ -61,6 +61,6 @@ This is a Farm Bot module for the [MasterCryptoFarmBot](https://github.com/maste
 
 ---
 
-👨‍💻 Developed by [MasterkinG32](https://github.com/masterking) for the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot).
+👨‍💻 Developed by [MasterkinG32](https://github.com/masterking32) for the [MasterCryptoFarmBot](https://github.com/masterking32/MasterCryptoFarmBot).
 
 🙏 Thanks to [All Contributors](https://github.com/masterking32/MCF_HamsterKombat/graphs/contributors).
