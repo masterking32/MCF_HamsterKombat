@@ -136,15 +136,10 @@ class Playground:
             promo_id, promo_proxy, promo_user_agent
         )
 
-        if promo_response is None:
-            request_status = "active"
+        if promo_response is None or not promo_response.get("promoCode"):
+            request_status = "used"
             request["status"] = request_status
-            self.requests[request_index] = request
-            return False
-
-        if not promo_response.get("promoCode"):
-            request_status = "active"
-            request["status"] = request_status
+            request["promoCode"] = None
             self.requests[request_index] = request
             return False
 
@@ -182,32 +177,35 @@ class Playground:
             self.log.info(
                 f"<m>[Playground]</m> 💻 <y>This process may take a while (up to 20 minutes)...</y>"
             )
+            self.log.info(
+                f"<m>[Playground]</m> ✅ <y> Once the key is generated, it will be used in the next account check.</y>"
+            )
             tries = 0
             while tries < 20:
                 response = self._promo_register_event(
                     promo_id, clientToken, proxy, user_agent
                 )
                 if response:
-                    self.log.info(
-                        f"<m>[Playground]</m> 🎯 <y>Event registered for <g>{promo_name}</g>...</y>"
-                    )
+                    # self.log.info(
+                    #     f"<m>[Playground]</m> 🎯 <y>Event registered for <g>{promo_name}</g>...</y>"
+                    # )
                     break
 
-                self.log.info(
-                    f"<m>[Playground]</m> 🔁 <y>Retrying to register event after {promo_game['retry_delay']} seconds.</y>"
-                )
+                # self.log.info(
+                #     f"<m>[Playground]</m> 🔁 <y>Retrying to register event after {promo_game['retry_delay']} seconds.</y>"
+                # )
                 time.sleep(promo_game["retry_delay"])
                 tries += 1
 
             if tries >= 20:
-                self.log.error(
-                    f"<m>[Playground]</m> 🔴 <red>Failed to generate promo key for <y>{promo_name}</y>!</red>"
-                )
+                # self.log.error(
+                #     f"<m>[Playground]</m> 🔴 <red>Failed to generate promo key for <y>{promo_name}</y>!</red>"
+                # )
                 return None
 
-            self.log.info(
-                f"<m>[Playground]</m> 🏓 <g>Proceeding to the final step of key generation...</g>"
-            )
+            # self.log.info(
+            #     f"<m>[Playground]</m> 🏓 <g>Proceeding to the final step of key generation...</g>"
+            # )
             promo_response = self._promo_create_code(
                 promo_id, clientToken, proxy, user_agent
             )
@@ -217,11 +215,16 @@ class Playground:
             self.log.info(
                 f"<m>[Playground]</m> 🔑 <g>Generated promo key for <y>{promo_name}</y>: <c>{promo_response['promoCode']}</c></g>"
             )
+
+            self.log.info(
+                f"<m>[Playground]</m> <g>This key will be used in the next account check.</g>"
+            )
             return promo_response
         except Exception as e:
             self.log.error(
                 f"<m>[Playground]</m> 🔴 <red>Error generating promo key: {e}</red>"
             )
+
             return None
 
     def _promo_register_event(self, promo_id, clientToken, proxy=None, user_agent=None):
