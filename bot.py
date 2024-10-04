@@ -12,6 +12,7 @@ import asyncio
 from pathlib import Path
 import threading
 import hashlib
+import requests
 
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
@@ -58,6 +59,7 @@ try:
 
     from mcf_utils.database import Database
     from mcf_utils import utils
+    from mcf_utils.api import API as MCF_API
 except Exception as e:
     print(CONFIG_ERROR_MSG)
     exit(1)
@@ -325,6 +327,28 @@ async def main():
         log.info(f"<g>🔑 License key: </g><c>{utils.hide_text(license_key)}</c>")
 
     bot_globals["license"] = license_key
+    apiObj = MCF_API(log)
+    modules = apiObj.get_modules(license_key)
+
+    if modules is None or "error" in modules:
+        log.error(f"<r>❌ Unable to get modules: {modules['error']}</r>")
+        exit(1)
+
+    if "modules" not in modules:
+        log.error("<r>❌ Unable to get modules: Modules key not found!</r>")
+        exit(1)
+
+    module_found = False
+    for module in modules["modules"]:
+        if module["name"] == module_name:
+            module_found = True
+            break
+
+    if not module_found:
+        log.error(f"<r>❌ {module_name} module is not found in the license!</r>")
+        exit(1)
+
+    log.info(f"<g>📦 {module_name} module is found in the license!</g>")
 
     if utilities.is_module_disabled(bot_globals, log):
         log.info(f"<r>🚫 {module_name} module is disabled!</r>")
