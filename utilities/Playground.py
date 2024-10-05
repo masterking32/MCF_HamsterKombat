@@ -250,6 +250,7 @@ class Playground:
                 headers=headers,
                 valid_response_code=204,
                 proxy=proxy,
+                display_error=False,
             )
 
         headers = self._get_promo_headers(promo_id, user_agent)
@@ -261,6 +262,7 @@ class Playground:
             payload=json.dumps(self._get_register_event_payload(promo_id)),
             valid_response_code=200,
             proxy=proxy,
+            display_error=False,
         )
 
         if response is None or "hasCode" not in response:
