@@ -322,6 +322,7 @@ class Playground:
         headers=None,
         payload=None,
         valid_response_code=200,
+        display_error=True,
         retries=3,
     ):
         try:
@@ -339,9 +340,10 @@ class Playground:
                 response = requests.options(url, headers=headers, proxies=proxy)
 
             if response.status_code != valid_response_code:
-                self.log.error(
-                    f"<m>[Playground]</m> 🔴 <red> {method} Request Error: {url} Response code: {response.status_code}</red>"
-                )
+                if display_error:
+                    self.log.error(
+                        f"<m>[Playground]</m> 🔴 <red> {method} Request Error: {url} Response code: {response.status_code}</red>"
+                    )
                 return None
             if method == "OPTIONS":
                 return True
