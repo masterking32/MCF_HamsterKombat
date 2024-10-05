@@ -62,6 +62,7 @@ try:
     from mcf_utils.api import API as MCF_API
 except Exception as e:
     print(CONFIG_ERROR_MSG)
+    print(f"Error: {e}")
     exit(1)
 
 
@@ -114,14 +115,14 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
             account["proxy"] = None
 
         tg = tgAccount(
-            bot_globals,
-            log,
-            account["session_name"],
-            account["proxy"],
-            BOT_ID,
-            REFERRAL_TOKEN,
-            SHORT_APP_NAME,
-            APP_URL,
+            bot_globals=bot_globals,
+            log=log,
+            accountName=account["session_name"],
+            proxy=account["proxy"],
+            BotID=BOT_ID,
+            ReferralToken=REFERRAL_TOKEN,
+            ShortAppName=SHORT_APP_NAME,
+            AppURL=APP_URL,
         )
 
         web_app_data = await tg.run()
@@ -327,6 +328,7 @@ async def main():
         log.info(f"<g>🔑 License key: </g><c>{utils.hide_text(license_key)}</c>")
 
     bot_globals["license"] = license_key
+    bot_globals["config"] = cfg.config
     apiObj = MCF_API(log)
     modules = apiObj.get_modules(license_key)
 
