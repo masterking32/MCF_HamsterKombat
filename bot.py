@@ -108,7 +108,7 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
             return
 
         log.info(
-            f"<g>🔆 Start processing Pyrogram account <c>{account['session_name']}</c> from group <c>{group_id}</c> ...</g>"
+            f"<g>🔆 Start processing Pyrogram/Telethon account <c>{account['session_name']}</c> from group <c>{group_id}</c> ...</g>"
         )
 
         if account.get("proxy") == "":
@@ -156,12 +156,12 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
         await fb.run()
     except Exception as e:
         log.error(
-            f"<r>❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c>, Error processing Pyrogram account: {e}</r>"
+            f"<r>❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c>, Error processing Pyrogram/Telethon account: {e}</r>"
         )
         return False
     finally:
         log.info(
-            f"<g>✅ Pyrogram account <c>{account['session_name']}</c> from group <c>{group_id}</c> has been processed.</g>"
+            f"<g>✅ Pyrogram/Telethon account <c>{account['session_name']}</c> from group <c>{group_id}</c> has been processed.</g>"
         )
 
 
@@ -369,7 +369,7 @@ async def main():
                 continue
 
             log.info(
-                f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram accounts, <c>{module_accounts}</c> module accounts.</g>"
+                f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram/Telethon accounts, <c>{module_accounts}</c> module accounts.</g>"
             )
 
             if pyrogram_accounts > 0 and (
@@ -472,7 +472,7 @@ async def main():
             )
             await check_cd(log)
         except Exception as e:
-            log.error(f"<r>❌ Error processing Pyrogram accounts: {e}</r>")
+            log.error(f"<r>❌ Error processing Pyrogram/Telethon accounts: {e}</r>")
             await check_cd(log)
         except KeyboardInterrupt:
             log.info(f"<r>🛑 Bot Module interrupted by user ...</r>")
