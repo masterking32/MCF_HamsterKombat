@@ -323,8 +323,11 @@ class Playground:
         payload=None,
         valid_response_code=200,
         display_error=True,
-        retries=3,
+        retries=2,
     ):
+        if retries < 0:
+            return None
+
         try:
             if proxy is not None:
                 proxy = {"http": proxy, "https": proxy}
