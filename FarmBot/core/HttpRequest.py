@@ -258,6 +258,7 @@ class HttpRequest:
             "cache-control": "no-cache",
             "access-control-request-method": method,
             "access-control-request-headers": "content-type",
+            "X-Requested-With": "org.telegram.messenger" if "android" in self.user_agent.lower() else "@@@SKIP_HEADER@@@",
         }
 
         if not headers:
