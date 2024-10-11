@@ -85,7 +85,7 @@ class PlaygroundRequests:
                     receiveKeysToday = state["receiveKeysToday"]
                     break
 
-            if int(receiveKeysToday) >= int(promo["keysPerDay"]):
+            if int(receiveKeysToday) >= int(promo["rewardsPerDay"]):
                 self.log.info(f"✅ <g>Max keys reached for <c>{promo_name}</c>...</g>")
                 continue
 
