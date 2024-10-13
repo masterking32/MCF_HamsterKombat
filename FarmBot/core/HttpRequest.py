@@ -62,6 +62,7 @@ class HttpRequest:
                 self._fix_url(url),
                 headers=default_headers,
                 proxies=self._get_proxy(),
+                timeout=30,
             )
 
             if response.status_code != valid_response_code:
@@ -130,12 +131,14 @@ class HttpRequest:
                     headers=default_headers,
                     data=payload,
                     proxies=self._get_proxy(),
+                    timeout=30,
                 )
             else:
                 response = requests.post(
                     self._fix_url(url),
                     headers=default_headers,
                     proxies=self._get_proxy(),
+                    timeout=30,
                 )
 
             if response.status_code != valid_response_code:
@@ -188,6 +191,7 @@ class HttpRequest:
                 url=url,
                 headers=default_headers,
                 proxies=self._get_proxy(),
+                timeout=30,
             )
 
             if response.status_code != valid_response_code:
