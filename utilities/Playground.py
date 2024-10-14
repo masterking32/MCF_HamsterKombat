@@ -355,8 +355,9 @@ class Playground:
         except Exception as e:
             if retries > 0:
                 self.log.info(
-                    f"<m>[Playground]</m> 🟡 <y> Unable to send request, retrying...</y>"
+                    f"<m>[Playground]</m> 🟡 <y> Unable to send request, retrying in 10 seconds...</y>"
                 )
+                time.sleep(10)
                 return self.http_request(
                     url,
                     proxy,
@@ -364,7 +365,7 @@ class Playground:
                     headers,
                     payload,
                     valid_response_code,
-                    retries - 1,
+                    retries=retries - 1,
                 )
             return None
 
