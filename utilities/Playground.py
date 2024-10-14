@@ -364,7 +364,7 @@ class Playground:
                     headers,
                     payload,
                     valid_response_code,
-                    retries - 1,
+                    retries=retries - 1,
                 )
             return None
 
