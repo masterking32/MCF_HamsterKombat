@@ -253,7 +253,7 @@ class Playground:
                 display_error=False,
             )
 
-        headers = self._get_promo_headers(promo_id, user_agent)
+        headers = self._get_promo_headers(promo_id, user_agent=user_agent)
         headers["authorization"] = f"Bearer {clientToken}"
         response = self.http_request(
             url=url,
@@ -295,7 +295,7 @@ class Playground:
                 proxy=proxy,
             )
 
-        headers = self._get_promo_headers(promo_id, user_agent)
+        headers = self._get_promo_headers(promo_id, user_agent=user_agent)
         headers["authorization"] = f"Bearer {clientToken}"
         response = self.http_request(
             url=url,
