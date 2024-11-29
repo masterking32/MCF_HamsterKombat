@@ -428,6 +428,8 @@ class Playground:
             return f"{int(time.time() * 1000)}-" + "".join(
                 random.choices(string.digits, k=19)
             )
+        elif type == "28str":
+            return "".join(random.choices(string.ascii_letters + string.digits, k=28))
         else:
             return type
 

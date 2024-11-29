@@ -438,4 +438,25 @@ PromoGames = {
         "delay": 120,
         "retry_delay": 180,
     },
+    "e355f8c7-3764-49cd-a298-530d666435c3": { # e355f8c7-3764-49cd-a298-530d666435c3
+        "newApi": True,
+        "name": "Aftermagic",
+        "appToken": "e355f8c7-3764-49cd-a298-530d666435c3",
+        "promoId": "e355f8c7-3764-49cd-a298-530d666435c3", # e355f8c7-3764-49cd-a298-530d666435c3
+        "headers": {
+            "accept": "*/*",
+            "connection": None,
+            "content-type": "application/json",
+            "user-agent": "UnityPlayer/2022.3.53f1 (UnityWebRequest/1.0, libcurl/8.10.1-DEV)",
+            "x-unity-version": "2022.3.53f1",
+        },
+        "clientOrigin": "android",
+        "clientIdType": "28str",
+        "clientVersion": "2.8.0",
+        "eventIdType": "uuid",
+        "eventOrigin": "undefined",
+        "eventType": None,
+        "delay": 120,
+        "retry_delay": 180,
+    },
 }
