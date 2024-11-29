@@ -438,11 +438,11 @@ PromoGames = {
         "delay": 120,
         "retry_delay": 180,
     },
-    "e355f8c7-3764-49cd-a298-530d666435c3": { # e355f8c7-3764-49cd-a298-530d666435c3
+    "e355f8c7-3764-49cd-a298-530d666435c3": {
         "newApi": True,
         "name": "Aftermagic",
         "appToken": "e355f8c7-3764-49cd-a298-530d666435c3",
-        "promoId": "e355f8c7-3764-49cd-a298-530d666435c3", # e355f8c7-3764-49cd-a298-530d666435c3
+        "promoId": "e355f8c7-3764-49cd-a298-530d666435c3",
         "headers": {
             "accept": "*/*",
             "connection": None,
