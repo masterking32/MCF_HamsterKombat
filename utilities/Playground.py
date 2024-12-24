@@ -430,6 +430,8 @@ class Playground:
             )
         elif type == "28str":
             return "".join(random.choices(string.ascii_letters + string.digits, k=28))
+        elif type == "ts-ms":
+            return str(int((time.time() * 1000)))
         else:
             return type
 

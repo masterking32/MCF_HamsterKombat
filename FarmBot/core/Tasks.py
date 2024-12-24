@@ -24,7 +24,7 @@ class Tasks:
             task_id = task["id"]
             task_type = task["type"]
 
-            if task_type not in {"WithLink", "WithLocaleLink"}:
+            if task_type not in {"WithLink", "WithLocaleLink"} or task_id in {"gleam_tasks"}:
                 continue
 
             self.claim_task(task_id)
