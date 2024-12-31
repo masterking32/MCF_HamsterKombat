@@ -73,6 +73,10 @@ class PlaygroundRequests:
         final_promos = []
         for promo in promos:
             promo_name = promo["title"]["en"]
+            if promo["promoId"] in [  # Exculude promos
+                "b2436c89-e0aa-4aed-8046-9b0515e1c46b",  # Zoopolis
+            ]:
+                continue
             if promo["promoId"] not in PromoGames:
                 self.log.info(
                     f"🟡 <y>Unsupported promo <g>{promo_name}</g> game...</y>"
