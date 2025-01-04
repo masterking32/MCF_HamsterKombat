@@ -27,7 +27,7 @@
     "default_value": 200,
     "description": "Upgrade coefficient, if [card price] / [card profit] > [Upgrade Coefficient] then do not buy this card.",
     "min": 100,
-    "max": 100000
+    "max": 1000000
   },
   {
     "key": "check_interval",
