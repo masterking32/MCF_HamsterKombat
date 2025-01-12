@@ -17,6 +17,7 @@ import time
 import utilities.utilities as utilities
 from FarmBot.FarmBot import FarmBot
 from utilities.Playground import Playground as Playground
+from mcf_utils.api import API
 
 # Constants
 CHECK_INTERVAL = utilities.getConfig("check_interval", 3600)
@@ -67,9 +68,13 @@ except Exception as e:
     exit(1)
 
 
-async def check_cd(log):
-    log.info(f"<y>💤 Checking again in </y><c>{CHECK_INTERVAL}</c><y> seconds ...</y>")
-    time.sleep(CHECK_INTERVAL)
+async def check_cd(log, bot_globals):
+    sleep_time = CHECK_INTERVAL
+    if not module_available(log, bot_globals["license"], bot_globals["module_name"]):
+        sleep_time = 600
+
+    log.info(f"<y>💤 Checking again in </y><c>{sleep_time}</c><y> seconds ...</y>")
+    time.sleep(sleep_time)
     random_wait = random.randint(60, 120)
     log.info(f"<y>💤 Random wait for </y><c>{random_wait}</c><y> seconds ...</y>")
     await asyncio.sleep(random_wait)
@@ -80,7 +85,52 @@ BOT_ID = "hamster_kombat_bot"
 REFERRAL_TOKEN = utilities.getConfig("referral_token", "kentId95736407")
 SHORT_APP_NAME = None
 APP_URL = "https://hamsterkombatgame.io/"
+VERSION_HASH = ""
 # End of variables to edit
+
+
+recent_checks = {}
+
+
+def module_available(logger, license, module_name):
+    if not license or not module_name:
+        return False
+
+    if not VERSION_HASH or VERSION_HASH == "":
+        return True
+
+    if (
+        "status" in recent_checks
+        and recent_checks["status"]
+        and "date" in recent_checks
+    ):
+        if time.time() - recent_checks["date"] < 600:
+            return recent_checks["status"]
+    recent_checks["date"] = time.time()
+    recent_checks["status"] = False
+
+    apiObj = API(logger)
+    data = {
+        "action": "version_check",
+        "module_name": module_name,
+        "version": VERSION_HASH,
+    }
+
+    response = apiObj.get_task_answer(license, data)
+    if "error" in response:
+        logger.error(f"<y>⭕ API Error: {response['error']}</y>")
+    elif "status" in response and response["status"] == "success":
+        recent_checks["status"] = True
+    elif (
+        "status" in response and response["status"] == "error" and "message" in response
+    ):
+        logger.info(f"<y>🟡 {response['message']}</y>")
+    else:
+        logger.error(
+            f"<y>🟡 Unable to verify module version, please try again later</y>"
+        )
+
+    return recent_checks["status"]
 
 
 def load_json_file(file_path, default=None):
@@ -136,6 +186,14 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
 
         web_app_data = await tg.run()
         if not web_app_data:
+            utilities.inc_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "name": "count"},
+            )
+            utilities.add_account_to_display_data(
+                "display_data_telegram_issues.json", account["session_name"]
+            )
             log.error(
                 f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> is not ready! Unable to retrieve WebApp data.</r>"
             )
@@ -143,6 +201,14 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
 
         web_app_query = utils.extract_tg_query_from_url(web_app_data)
         if not web_app_query:
+            utilities.add_account_to_display_data(
+                "display_data_telegram_issues.json", account["session_name"]
+            )
+            utilities.inc_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "name": "count"},
+            )
             log.error(
                 f"<r>└─ ❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c> WebApp query is not valid!</r>"
             )
@@ -236,6 +302,15 @@ async def handle_accounts(group_id, accounts, bot_globals, log):
 
         for account in accounts:
             try:
+                module_status = module_available(
+                    log, bot_globals["license"], bot_globals["module_name"]
+                )
+                if not module_status:
+                    log.error(
+                        f"<r>❌ Module <c>{bot_globals['module_name']}</c> API has been changed. Please wait for an update.</r>"
+                    )
+                    return
+
                 if account["is_pyrogram"]:
                     await process_pg_account(account, bot_globals, log, group_id)
                 else:
@@ -266,9 +341,19 @@ def load_accounts():
         if pyrogram_accounts is not None:
             for account in pyrogram_accounts:
                 if account.get("disabled", False):
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 if account["session_name"] in disabled_accounts:
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 pyrogram_accounts_count += 1
@@ -279,6 +364,11 @@ def load_accounts():
         if module_accounts is not None:
             for account in module_accounts:
                 if account.get("disabled", False):
+                    utilities.inc_display_data(
+                        "display_data.json",
+                        "disabled_accounts",
+                        {"title": "Disabled Accounts", "name": "count"},
+                    )
                     continue
 
                 module_accounts_count += 1
@@ -375,14 +465,44 @@ async def main():
     while True:
         try:
             log.info("<g>🔍 Checking for accounts ...</g>")
+
+            utilities.clear_display_data("display_data.json")
+            utilities.clear_display_data("display_data_telegram_issues.json")
+            utilities.clear_display_data("display_data_bot_issues.json")
+            utilities.clear_display_data("display_data_success_accounts.json")
+
             pyrogram_accounts, module_accounts, all_accounts = load_accounts()
             if all_accounts is None or len(all_accounts) == 0:
                 log.info("<y>🟠 No accounts found!</y>")
-                await check_cd(log)
+                await check_cd(log, bot_globals)
                 continue
 
             log.info(
                 f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram/Telethon accounts, <c>{module_accounts}</c> module accounts.</g>"
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "active_accounts",
+                {"title": "Active Accounts", "count": len(all_accounts)},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "pyrogram_accounts",
+                {"title": "Pyrogram/Telethon Accounts", "count": pyrogram_accounts},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "module_accounts",
+                {"title": "Module Accounts", "count": module_accounts},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "success_accounts",
+                {"title": "Successfull farm finished accounts", "count": 0},
             )
 
             if pyrogram_accounts > 0 and (
@@ -395,6 +515,18 @@ async def main():
                 return False
 
             grouped_accounts = group_by_proxy(all_accounts)
+
+            utilities.update_display_data(
+                "display_data.json",
+                "proxy_groups",
+                {"title": "Proxy Groups", "count": len(grouped_accounts)},
+            )
+
+            utilities.update_display_data(
+                "display_data.json",
+                "telegram_issues",
+                {"title": "Telegram Issues", "count": 0},
+            )
 
             log.info(
                 f"<g>🔄 Accounts have been grouped into <c>{len(grouped_accounts)}</c> based on their proxies. Each group will run in a separate thread.</g>"
@@ -430,7 +562,7 @@ async def main():
                     )
             except Exception as e:
                 log.error(f"<r>❌ Error grouping accounts: {e}</r>")
-                await check_cd(log)
+                await check_cd(log, bot_globals)
                 continue
 
             tasks = []
@@ -483,10 +615,10 @@ async def main():
             log.info(
                 "<g>✅ All accounts and groups have been processed successfully. Waiting for the next check ...</g>"
             )
-            await check_cd(log)
+            await check_cd(log, bot_globals)
         except Exception as e:
             log.error(f"<r>❌ Error processing Pyrogram/Telethon accounts: {e}</r>")
-            await check_cd(log)
+            await check_cd(log, bot_globals)
         except KeyboardInterrupt:
             log.info(f"<r>🛑 Bot Module interrupted by user ...</r>")
             break
