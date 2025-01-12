@@ -220,10 +220,6 @@ async def process_pg_account(account, bot_globals, log, group_id=None):
         )
 
         await fb.run()
-
-        utilities.add_account_to_display_data(
-            "display_data_bot_issues.json", account["session_name"]
-        )
     except Exception as e:
         log.error(
             f"<r>❌ Account <c>{account['session_name']}</c> from group <c>{group_id}</c>, Error processing Pyrogram/Telethon account: {e}</r>"
