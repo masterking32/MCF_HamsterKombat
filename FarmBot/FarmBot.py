@@ -7,7 +7,7 @@ import sys
 import os
 import time
 
-from utilities.utilities import getConfig
+from utilities.utilities import add_account_to_display_data, getConfig, inc_display_data
 
 MasterCryptoFarmBot_Dir = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__ + "/../../"))
@@ -56,11 +56,17 @@ class FarmBot:
 
             ip = basic.ip()
             if ip is None:
+                add_account_to_display_data(
+                    "display_data_bot_issues.json", self.account_name
+                )
                 return
 
             auth = Auth(self.log, self.http)
             login_data = auth.login(self.web_app_query)
             if login_data is None:
+                add_account_to_display_data(
+                    "display_data_bot_issues.json", self.account_name
+                )
                 return
 
             self.authUserId = login_data["authUserId"]
@@ -70,6 +76,9 @@ class FarmBot:
 
             account_info, interlude_config_version = auth.get_account_info()
             if account_info is None or interlude_config_version is None:
+                add_account_to_display_data(
+                    "display_data_bot_issues.json", self.account_name
+                )
                 return
 
             sync = basic.get_sync()
@@ -161,8 +170,23 @@ class FarmBot:
                 f"<g>🤖 Farming is completed for account <cyan>{self.account_name}</cyan>!</g>"
             )
 
+            add_account_to_display_data(
+                "display_data_success_accounts.json",
+                self.account_name,
+                "Profit: " + str(earnPassivePerHour_short),
+                totalDiamonds_short,
+            )
+
+            inc_display_data(
+                "display_data.json",
+                "success_accounts",
+                {"title": "Successfull farm finished accounts", "name": "count"},
+            )
             return True
         except Exception as e:
+            add_account_to_display_data(
+                "display_data_bot_issues.json", self.account_name
+            )
             self.log.error(f"<r>❌ Error running FarmBot: {e}</r>")
             return False
         finally:
