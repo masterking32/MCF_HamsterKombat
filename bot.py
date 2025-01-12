@@ -456,6 +456,12 @@ async def main():
     while True:
         try:
             log.info("<g>🔍 Checking for accounts ...</g>")
+
+            utilities.clear_display_data("display_data.json")
+            utilities.clear_display_data("display_data_telegram_issues.json")
+            utilities.clear_display_data("display_data_bot_issues.json")
+            utilities.clear_display_data("display_data_success_accounts.json")
+
             pyrogram_accounts, module_accounts, all_accounts = load_accounts()
             if all_accounts is None or len(all_accounts) == 0:
                 log.info("<y>🟠 No accounts found!</y>")
@@ -465,11 +471,6 @@ async def main():
             log.info(
                 f"<g>👥 Found <c>{len(all_accounts)}</c> accounts: <c>{pyrogram_accounts}</c> Pyrogram/Telethon accounts, <c>{module_accounts}</c> module accounts.</g>"
             )
-
-            utilities.clear_display_data("display_data.json")
-            utilities.clear_display_data("display_data_telegram_issues.json")
-            utilities.clear_display_data("display_data_bot_issues.json")
-            utilities.clear_display_data("display_data_success_accounts.json")
 
             utilities.update_display_data(
                 "display_data.json",
