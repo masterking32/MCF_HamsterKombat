@@ -138,11 +138,11 @@ def inc_display_data(file_name, key, value):
     return data
 
 
-def add_account_to_display_data(file_name, session_name, more_data=""):
+def add_account_to_display_data(file_name, session_name, more_data="", balance=0):
     file_path = os.path.join(MODULE_DIR, file_name)
     data = get_display_data(file_path)
     date = time.strftime("%Y-%m-%d %H:%M:%S")
-    final_data = {"data": more_data, "date": date}
+    final_data = {"data": more_data, "date": date, "balance": balance}
     data[session_name] = final_data
     save_display_data(file_path, data)
 
